@@ -17,8 +17,9 @@ import {
   Landmark,
   ShieldAlert,
   RotateCcw,
+  ShoppingBag,
 } from 'lucide-react';
-import { calculateNoCostEmiDrag } from '@/lib/financial-engine';
+import { calculateNoCostEmiDrag, evaluateMultiCartEmiRisk } from '@/lib/financial-engine';
 
 export type InterceptorType = 'EMI' | 'VEHICLE_LOAN';
 
@@ -30,6 +31,8 @@ interface CommitGuardModalProps {
   onModifyTerms?: () => void;
   // Optional overrides
   initialProductPrice?: number;
+  isMultiItemCart?: boolean;
+  cartItemCount?: number;
 }
 
 export const CommitGuardModal: React.FC<CommitGuardModalProps> = ({
@@ -39,6 +42,8 @@ export const CommitGuardModal: React.FC<CommitGuardModalProps> = ({
   onProceedAnyway,
   onModifyTerms,
   initialProductPrice,
+  isMultiItemCart = false,
+  cartItemCount = 1,
 }) => {
   // -------------------------------------------------------------
   // Scenario A State: E-Commerce EMI Simulator
@@ -61,6 +66,11 @@ export const CommitGuardModal: React.FC<CommitGuardModalProps> = ({
       bankNominalInterestRate: nominalRate,
     });
   }, [productPrice, tenure, processingFee, nominalRate]);
+
+  // Multi-cart risk evaluation
+  const multiCartRisk = useMemo(() => {
+    return evaluateMultiCartEmiRisk(productPrice, cartItemCount, tenure, nominalRate);
+  }, [productPrice, cartItemCount, tenure, nominalRate]);
 
   // -------------------------------------------------------------
   // Scenario B State: Vehicle "Time vs. Debt" Engine
@@ -176,6 +186,42 @@ export const CommitGuardModal: React.FC<CommitGuardModalProps> = ({
 
             <div className="p-6 space-y-5 max-h-[82vh] overflow-y-auto">
               
+              {/* Multi-Item Cart Diagnostic Banner */}
+              {isMultiItemCart && (
+                <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 shadow-sm text-slate-800">
+                  <div className="flex items-start gap-2.5">
+                    <span className="p-1.5 rounded-lg bg-amber-500/10 text-amber-700 mt-0.5 shrink-0">
+                      <ShoppingBag className="w-4 h-4" />
+                    </span>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-xs font-bold text-amber-950 uppercase tracking-wide">
+                          Multi-Item Cart Detected
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full bg-amber-200/70 text-amber-900 text-[11px] font-bold">
+                          {cartItemCount} Items • ₹{productPrice.toLocaleString('en-IN')} Total
+                        </span>
+                        {!multiCartRisk.meetsMinThreshold ? (
+                          <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-bold">
+                            ⚠️ Below ₹3,000 Minimum
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                            Meets Minimum Threshold
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[12px] text-amber-900/90 mt-1 leading-snug">
+                        <strong>⚠️ Mixed-Cart EMI Risk:</strong> If any single item is non-eligible, your bank charges <strong>15% standard loan interest (~₹{multiCartRisk.totalRiskAmount.toLocaleString('en-IN')} extra)</strong> across the entire cart.
+                      </p>
+                      <div className="mt-2 text-[11px] text-emerald-800 font-medium">
+                        💡 <strong>Tip:</strong> Buy high-ticket items on EMI separately to guarantee your full interest waiver.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Context Headline */}
               <div className="space-y-1">
                 <h3 className="text-xl font-extrabold text-slate-900">

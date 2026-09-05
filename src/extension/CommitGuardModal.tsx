@@ -25,7 +25,7 @@ import {
   ShoppingBag,
   Edit3,
 } from 'lucide-react';
-import { calculateNoCostEmiDrag } from '../lib/financial-engine';
+import { calculateNoCostEmiDrag, evaluateMultiCartEmiRisk } from '../lib/financial-engine';
 
 export type InterceptorSurface = 'AMAZON' | 'FLIPKART' | 'ECOMMERCE' | 'TRAVEL' | 'EDTECH' | 'UDEMY';
 
@@ -48,6 +48,9 @@ export interface ExtensionModalProps {
   originalPrice?: number;
   discountPercent?: number;
   scrapedOffers?: ScrapedOffer[];
+  isMultiItemCart?: boolean;
+  cartItemCount?: number;
+  cartItemsPreview?: string[];
   onProceedAndContinue: () => void; // Proceeds to host site action
   onCancelStayOnPage: () => void;   // Closes modal and keeps user on CURRENT page
 }
@@ -59,6 +62,9 @@ export const ExtensionCommitGuardModal: React.FC<ExtensionModalProps> = ({
   originalPrice,
   discountPercent,
   scrapedOffers = [],
+  isMultiItemCart = false,
+  cartItemCount = 1,
+  cartItemsPreview = [],
   onProceedAndContinue,
   onCancelStayOnPage,
 }) => {
@@ -177,6 +183,11 @@ export const ExtensionCommitGuardModal: React.FC<ExtensionModalProps> = ({
       sipGain,
     };
   }, [mathResult, tenure]);
+
+  // Evaluate Multi-Cart EMI Disqualification Risk & Minimum Thresholds
+  const multiCartRisk = useMemo(() => {
+    return evaluateMultiCartEmiRisk(productPrice, cartItemCount, tenure, 15.0);
+  }, [productPrice, cartItemCount, tenure]);
 
   // Dynamic fallback offers customized per surface if none scraped
   const displayOffers: ScrapedOffer[] = useMemo(() => {
@@ -405,6 +416,53 @@ export const ExtensionCommitGuardModal: React.FC<ExtensionModalProps> = ({
             )}
           </div>
         </div>
+
+        {/* Multi-Item Cart Alert Banner */}
+        {isMultiItemCart && (
+          <div className="mx-6 my-3 p-3.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 shadow-sm text-slate-800">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2.5">
+                <span className="p-1.5 rounded-lg bg-amber-500/10 text-amber-700 mt-0.5 shrink-0">
+                  <ShoppingBag className="w-4 h-4" />
+                </span>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-xs font-bold text-amber-950 uppercase tracking-wide">
+                      Multi-Item Cart Detected
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-amber-200/70 text-amber-900 text-[11px] font-bold">
+                      {cartItemCount} Items • ₹{productPrice.toLocaleString('en-IN')} Total
+                    </span>
+                    {!multiCartRisk.meetsMinThreshold ? (
+                      <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-bold">
+                        ⚠️ Below ₹3,000 Minimum for EMI
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                        Cart Meets ₹3,000 Min
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[12px] text-amber-900/90 mt-1 leading-snug">
+                    <strong>⚠️ Mixed-Cart EMI Risk:</strong> If even <em>one</em> item in this cart is ineligible for No-Cost EMI, banks frequently void the merchant discount and charge <strong>15% standard loan interest (~₹{multiCartRisk.totalRiskAmount.toLocaleString('en-IN')} extra)</strong> across the entire order!
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-2.5 pt-2.5 border-t border-amber-200/70 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+              <div className="flex items-center gap-1.5 text-amber-950 font-medium">
+                <span className="text-emerald-700 font-bold">💡 Split-Order Recommendation:</span>
+                <span>Checkout high-ticket EMI item alone to guarantee 100% interest waiver, then buy accessories via UPI.</span>
+              </div>
+              {cartItemsPreview && cartItemsPreview.length > 0 && (
+                <div className="text-[10px] text-slate-500 truncate max-w-full italic">
+                  Detected in cart: {cartItemsPreview.slice(0, 3).join(', ')}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Tab Navigation: Card Offers vs EMI Friction Breakdown */}
         <div className="flex border-b border-slate-200 bg-slate-100/70 p-1.5 gap-1.5">

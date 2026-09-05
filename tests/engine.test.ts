@@ -9,6 +9,7 @@ import {
   calculateLockInVsLiquidity,
   calculatePostTaxRealYield,
   calculateOpportunityCost,
+  evaluateMultiCartEmiRisk,
 } from '../src/lib/financial-engine';
 import { validateAntiAdvisoryGuardrail } from '../src/lib/llm-guardrail';
 import { evaluatePolicyAlerts } from '../src/lib/policy-alerts';
@@ -111,4 +112,25 @@ assert.strictEqual(validateAntiAdvisoryGuardrail('Statutory 18% GST applies to m
   'Must permit neutral factual arithmetic statements');
 console.log('✅ Test 5 Passed: Heuristic safe-harbor guardrails verified.\n');
 
-console.log('🎉 All 5 Test Suites Passed with 100% Deterministic Precision!');
+// -------------------------------------------------------------
+// Test 6: Multi-Item Cart EMI Risk & Disqualification Evaluator
+// -------------------------------------------------------------
+console.log('Test 6: Verifying Multi-Item Cart EMI Risk Evaluator...');
+const singleItem = evaluateMultiCartEmiRisk(2500, 1, 6);
+assert.strictEqual(singleItem.isMultiItem, false);
+assert.strictEqual(singleItem.meetsMinThreshold, false, '₹2,500 must fail ₹3,000 threshold');
+assert.strictEqual(singleItem.totalRiskAmount, 0, 'Single item has no mixed cart risk');
+
+const multiCart = evaluateMultiCartEmiRisk(45000, 3, 6, 15.0);
+console.log(`  -> Multi-Item Cart (3 items, ₹45,000): Meets Min = ${multiCart.meetsMinThreshold}`);
+console.log(`  -> Potential Interest Leakage: ₹${multiCart.potentialInterestLeak}`);
+console.log(`  -> Potential GST Drag: ₹${multiCart.potentialGstLeak}`);
+console.log(`  -> Total Risk: ₹${multiCart.totalRiskAmount}`);
+
+assert.strictEqual(multiCart.isMultiItem, true);
+assert.strictEqual(multiCart.meetsMinThreshold, true);
+assert(multiCart.potentialInterestLeak > 3000, 'Interest leak for ₹45k @ 15% 6m should exceed ₹3,000');
+assert(multiCart.totalRiskAmount > 3500, 'Total risk including GST should exceed ₹3,500');
+console.log('✅ Test 6 Passed: Multi-Cart EMI Risk & Threshold logic verified.\n');
+
+console.log('🎉 All 6 Test Suites Passed with 100% Deterministic Precision!');

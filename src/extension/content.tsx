@@ -75,12 +75,18 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
     name: string;
     advertisedMonthlyEmi?: number;
     offers: ScrapedOffer[];
+    isMultiItemCart?: boolean;
+    cartItemCount?: number;
+    cartItemsPreview?: string[];
   } {
     let detectedPrice = 0;
     let detectedOriginalPrice = 0;
     let detectedDiscount = 0;
     let detectedName = '';
     let detectedEmi: number | undefined;
+    let isMultiItemCart = false;
+    let cartItemCount = 1;
+    let cartItemsPreview: string[] = [];
 
     const bodyText = document.body ? document.body.innerText : '';
 
@@ -144,6 +150,17 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
       }
 
       const travelPrice = detectedPrice > 0 ? detectedPrice : 13006;
+
+      // Multi-passenger & return route detection
+      const paxMatch = bodyText.match(/(\d+)\s*(?:Adults?|Travellers?|Passengers?)/i);
+      if (paxMatch && paxMatch[1]) {
+        const count = parseInt(paxMatch[1], 10);
+        if (count > 1) {
+          isMultiItemCart = true;
+          cartItemCount = count;
+          cartItemsPreview.push(`${count} Travellers`);
+        }
+      }
 
       // =========================================================================
       // UNIVERSAL DYNAMIC DOM BANK & CARD EXTRACTOR (100% Free of Hardcoded Lists)
@@ -422,6 +439,9 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         price: travelPrice,
         name: detectedName,
         offers: travelOffers,
+        isMultiItemCart,
+        cartItemCount,
+        cartItemsPreview,
       };
     }
 
@@ -479,6 +499,9 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         price: edTechPrice,
         name: detectedName,
         offers: edTechOffers,
+        isMultiItemCart,
+        cartItemCount,
+        cartItemsPreview,
       };
     }
 
@@ -580,6 +603,9 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         discountPercent: discountPct,
         name: detectedName,
         offers: udemyOffers,
+        isMultiItemCart,
+        cartItemCount,
+        cartItemsPreview,
       };
     }
 
@@ -651,6 +677,38 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
       if (amazonSavingsEl && amazonSavingsEl.textContent) {
         const dMatch = amazonSavingsEl.textContent.match(/(\d+)%/);
         if (dMatch && dMatch[1]) detectedDiscount = parseInt(dMatch[1], 10);
+      }
+
+      // Cart & Multi-Item Detection on Amazon
+      const isAmazonCartPage =
+        window.location.href.includes('/cart') ||
+        window.location.href.includes('/gp/cart') ||
+        window.location.href.includes('/buy/') ||
+        document.querySelector('#sc-active-cart, #gutterCartViewForm, #activeCartViewForm') !== null;
+
+      const subtotalMatch = bodyText.match(/Subtotal\s*\(\s*(\d+)\s*items?\s*\)/i);
+      if (subtotalMatch && subtotalMatch[1]) {
+        const count = parseInt(subtotalMatch[1], 10);
+        if (count > 1) {
+          isMultiItemCart = true;
+          cartItemCount = count;
+        }
+      } else if (isAmazonCartPage) {
+        const cartItemEls = document.querySelectorAll('.sc-list-item, div[data-asin]');
+        if (cartItemEls.length > 1) {
+          isMultiItemCart = true;
+          cartItemCount = cartItemEls.length;
+        }
+      }
+
+      if (isMultiItemCart) {
+        const titleEls = document.querySelectorAll('.sc-product-title, .a-truncate-cut');
+        titleEls.forEach((el, idx) => {
+          if (idx < 3 && el.textContent) {
+            const cleanT = el.textContent.trim();
+            if (cleanT.length > 3) cartItemsPreview.push(cleanT.slice(0, 45));
+          }
+        });
       }
 
       const amazonFinalPrice = detectedPrice > 0 ? detectedPrice : 32295;
@@ -746,6 +804,9 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         discountPercent: detectedDiscount > 0 ? detectedDiscount : undefined,
         name: detectedName,
         offers: amazonOffers,
+        isMultiItemCart,
+        cartItemCount,
+        cartItemsPreview,
       };
     }
 
@@ -952,6 +1013,37 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
       });
     }
 
+    // Cart & Multi-Item Detection on Flipkart
+    const isFlipkartCartPage =
+      window.location.href.includes('/viewcart') ||
+      window.location.href.includes('/checkout') ||
+      document.querySelector('div[class*="cartItem"], div._1AtVbE:has([class*="price"])') !== null;
+
+    const fkCountMatch = bodyText.match(/(?:Price|Total\s*Payable)\s*\(\s*(\d+)\s*items?\s*\)/i);
+    if (fkCountMatch && fkCountMatch[1]) {
+      const count = parseInt(fkCountMatch[1], 10);
+      if (count > 1) {
+        isMultiItemCart = true;
+        cartItemCount = count;
+      }
+    } else if (isFlipkartCartPage) {
+      const fkItems = document.querySelectorAll('div[class*="cartItem"], div._2n0QD9, a[class*="title"]');
+      if (fkItems.length > 1) {
+        isMultiItemCart = true;
+        cartItemCount = Math.min(fkItems.length, 10);
+      }
+    }
+
+    if (isMultiItemCart) {
+      const fkTitleEls = document.querySelectorAll('div[class*="cartItem"] a, div._2Kn22P, ._2-uGAT');
+      fkTitleEls.forEach((el, idx) => {
+        if (idx < 3 && el.textContent) {
+          const cleanT = el.textContent.trim();
+          if (cleanT.length > 3) cartItemsPreview.push(cleanT.slice(0, 45));
+        }
+      });
+    }
+
     return {
       surfaceType: 'FLIPKART',
       price: flipkartPrice,
@@ -960,6 +1052,9 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
       name: detectedName,
       advertisedMonthlyEmi: detectedEmi,
       offers: flipkartOffers,
+      isMultiItemCart,
+      cartItemCount,
+      cartItemsPreview,
     };
   }
 
@@ -976,8 +1071,11 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
     offers: ScrapedOffer[],
     originalPrice: number | undefined,
     discountPercent: number | undefined,
-    onProceedCallback: () => void,
-    onCancelCallback: () => void
+    isMultiItemCart: boolean = false,
+    cartItemCount: number = 1,
+    cartItemsPreview: string[] = [],
+    onProceedCallback: () => void = () => {},
+    onCancelCallback: () => void = () => {}
   ) {
     if (document.getElementById(COMMITGUARD_HOST_ID)) {
       return; // Already open
@@ -1063,6 +1161,9 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         originalPrice={originalPrice}
         discountPercent={discountPercent}
         scrapedOffers={offers}
+        isMultiItemCart={isMultiItemCart}
+        cartItemCount={cartItemCount}
+        cartItemsPreview={cartItemsPreview}
         onProceedAndContinue={handleProceed}
         onCancelStayOnPage={handleCancel}
       />
@@ -1244,6 +1345,9 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         productInfo.offers,
         productInfo.originalPrice,
         productInfo.discountPercent,
+        productInfo.isMultiItemCart || false,
+        productInfo.cartItemCount || 1,
+        productInfo.cartItemsPreview || [],
         // On Proceed: mark as authorized and let the click advance to next page
         () => {
           targetEl.setAttribute('data-commitguard-authorized', 'true');
@@ -1313,6 +1417,9 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         productInfo.offers,
         productInfo.originalPrice,
         productInfo.discountPercent,
+        productInfo.isMultiItemCart || false,
+        productInfo.cartItemCount || 1,
+        productInfo.cartItemsPreview || [],
         () => {},
         () => {}
       );

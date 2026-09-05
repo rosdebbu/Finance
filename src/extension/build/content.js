@@ -7610,6 +7610,24 @@
     }
     return r;
   }
+  function evaluateMultiCartEmiRisk(totalCartValue, itemCount = 1, selectedTenureMonths = 6, standardInterestRatePct = 15) {
+    const minThresholdRequired = 3e3;
+    const meetsMinThreshold = totalCartValue >= minThresholdRequired;
+    const isMultiItem = itemCount > 1;
+    const potentialInterestLeak = isMultiItem ? Number((totalCartValue * (standardInterestRatePct / 100) * (selectedTenureMonths / 12)).toFixed(2)) : 0;
+    const potentialGstLeak = Number((potentialInterestLeak * GST_RATE).toFixed(2));
+    const totalRiskAmount = Number((potentialInterestLeak + potentialGstLeak).toFixed(2));
+    return {
+      isMultiItem,
+      itemCount,
+      totalCartValue,
+      meetsMinThreshold,
+      minThresholdRequired,
+      potentialInterestLeak,
+      potentialGstLeak,
+      totalRiskAmount
+    };
+  }
 
   // src/extension/CommitGuardModal.tsx
   var ExtensionCommitGuardModal = ({
@@ -7619,6 +7637,9 @@
     originalPrice,
     discountPercent,
     scrapedOffers = [],
+    isMultiItemCart = false,
+    cartItemCount = 1,
+    cartItemsPreview = [],
     onProceedAndContinue,
     onCancelStayOnPage
   }) => {
@@ -7708,6 +7729,9 @@
         sipGain
       };
     }, [mathResult, tenure]);
+    const multiCartRisk = (0, import_react3.useMemo)(() => {
+      return evaluateMultiCartEmiRisk(productPrice, cartItemCount, tenure, 15);
+    }, [productPrice, cartItemCount, tenure]);
     const displayOffers = (0, import_react3.useMemo)(() => {
       if (scrapedOffers && scrapedOffers.length > 0) return scrapedOffers;
       if (surfaceType === "AMAZON") {
@@ -7839,7 +7863,7 @@
           className: "p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
         },
         /* @__PURE__ */ import_react3.default.createElement(X, { className: "w-5 h-5" })
-      ))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "px-6 py-3 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xs font-semibold text-slate-700 truncate max-w-xs sm:max-w-md" }, productName)), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, originalPrice && /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xs text-slate-400 line-through" }, "\u20B9", originalPrice.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-base font-black text-slate-900" }, "\u20B9", productPrice.toLocaleString("en-IN")), discountPercent && /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800" }, discountPercent, "% OFF"))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex border-b border-slate-200 bg-slate-100/70 p-1.5 gap-1.5" }, /* @__PURE__ */ import_react3.default.createElement(
+      ))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "px-6 py-3 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xs font-semibold text-slate-700 truncate max-w-xs sm:max-w-md" }, productName)), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, originalPrice && /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xs text-slate-400 line-through" }, "\u20B9", originalPrice.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-base font-black text-slate-900" }, "\u20B9", productPrice.toLocaleString("en-IN")), discountPercent && /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800" }, discountPercent, "% OFF"))), isMultiItemCart && /* @__PURE__ */ import_react3.default.createElement("div", { className: "mx-6 my-3 p-3.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 shadow-sm text-slate-800" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-start justify-between gap-3" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-start gap-2.5" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "p-1.5 rounded-lg bg-amber-500/10 text-amber-700 mt-0.5 shrink-0" }, /* @__PURE__ */ import_react3.default.createElement(ShoppingBag, { className: "w-4 h-4" })), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex flex-wrap items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xs font-bold text-amber-950 uppercase tracking-wide" }, "Multi-Item Cart Detected"), /* @__PURE__ */ import_react3.default.createElement("span", { className: "px-2 py-0.5 rounded-full bg-amber-200/70 text-amber-900 text-[11px] font-bold" }, cartItemCount, " Items \u2022 \u20B9", productPrice.toLocaleString("en-IN"), " Total"), !multiCartRisk.meetsMinThreshold ? /* @__PURE__ */ import_react3.default.createElement("span", { className: "px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-bold" }, "\u26A0\uFE0F Below \u20B93,000 Minimum for EMI") : /* @__PURE__ */ import_react3.default.createElement("span", { className: "px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold" }, "Cart Meets \u20B93,000 Min")), /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-[12px] text-amber-900/90 mt-1 leading-snug" }, /* @__PURE__ */ import_react3.default.createElement("strong", null, "\u26A0\uFE0F Mixed-Cart EMI Risk:"), " If even ", /* @__PURE__ */ import_react3.default.createElement("em", null, "one"), " item in this cart is ineligible for No-Cost EMI, banks frequently void the merchant discount and charge ", /* @__PURE__ */ import_react3.default.createElement("strong", null, "15% standard loan interest (~\u20B9", multiCartRisk.totalRiskAmount.toLocaleString("en-IN"), " extra)"), " across the entire order!")))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "mt-2.5 pt-2.5 border-t border-amber-200/70 flex flex-wrap items-center justify-between gap-2 text-[11px]" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-1.5 text-amber-950 font-medium" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-emerald-700 font-bold" }, "\u{1F4A1} Split-Order Recommendation:"), /* @__PURE__ */ import_react3.default.createElement("span", null, "Checkout high-ticket EMI item alone to guarantee 100% interest waiver, then buy accessories via UPI.")), cartItemsPreview && cartItemsPreview.length > 0 && /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[10px] text-slate-500 truncate max-w-full italic" }, "Detected in cart: ", cartItemsPreview.slice(0, 3).join(", ")))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex border-b border-slate-200 bg-slate-100/70 p-1.5 gap-1.5" }, /* @__PURE__ */ import_react3.default.createElement(
         "button",
         {
           type: "button",
@@ -8063,6 +8087,9 @@
       let detectedDiscount = 0;
       let detectedName = "";
       let detectedEmi;
+      let isMultiItemCart = false;
+      let cartItemCount = 1;
+      let cartItemsPreview = [];
       const bodyText = document.body ? document.body.innerText : "";
       if (CURRENT_SURFACE === "TRAVEL") {
         let cleanBankText2 = function(raw) {
@@ -8124,6 +8151,15 @@
           }
         }
         const travelPrice = detectedPrice > 0 ? detectedPrice : 13006;
+        const paxMatch = bodyText.match(/(\d+)\s*(?:Adults?|Travellers?|Passengers?)/i);
+        if (paxMatch && paxMatch[1]) {
+          const count = parseInt(paxMatch[1], 10);
+          if (count > 1) {
+            isMultiItemCart = true;
+            cartItemCount = count;
+            cartItemsPreview.push(`${count} Travellers`);
+          }
+        }
         let detectedBankName = "";
         let detectedCategory = "";
         let isExplicitUpi = false;
@@ -8323,7 +8359,10 @@
           surfaceType: "TRAVEL",
           price: travelPrice,
           name: detectedName,
-          offers: travelOffers
+          offers: travelOffers,
+          isMultiItemCart,
+          cartItemCount,
+          cartItemsPreview
         };
       }
       if (CURRENT_SURFACE === "EDTECH") {
@@ -8372,7 +8411,10 @@
           surfaceType: "EDTECH",
           price: edTechPrice,
           name: detectedName,
-          offers: edTechOffers
+          offers: edTechOffers,
+          isMultiItemCart,
+          cartItemCount,
+          cartItemsPreview
         };
       }
       if (CURRENT_SURFACE === "UDEMY") {
@@ -8458,7 +8500,10 @@
           originalPrice: udemyOrigPrice,
           discountPercent: discountPct,
           name: detectedName,
-          offers: udemyOffers
+          offers: udemyOffers,
+          isMultiItemCart,
+          cartItemCount,
+          cartItemsPreview
         };
       }
       if (CURRENT_SURFACE === "AMAZON") {
@@ -8520,6 +8565,30 @@
         if (amazonSavingsEl && amazonSavingsEl.textContent) {
           const dMatch = amazonSavingsEl.textContent.match(/(\d+)%/);
           if (dMatch && dMatch[1]) detectedDiscount = parseInt(dMatch[1], 10);
+        }
+        const isAmazonCartPage = window.location.href.includes("/cart") || window.location.href.includes("/gp/cart") || window.location.href.includes("/buy/") || document.querySelector("#sc-active-cart, #gutterCartViewForm, #activeCartViewForm") !== null;
+        const subtotalMatch = bodyText.match(/Subtotal\s*\(\s*(\d+)\s*items?\s*\)/i);
+        if (subtotalMatch && subtotalMatch[1]) {
+          const count = parseInt(subtotalMatch[1], 10);
+          if (count > 1) {
+            isMultiItemCart = true;
+            cartItemCount = count;
+          }
+        } else if (isAmazonCartPage) {
+          const cartItemEls = document.querySelectorAll(".sc-list-item, div[data-asin]");
+          if (cartItemEls.length > 1) {
+            isMultiItemCart = true;
+            cartItemCount = cartItemEls.length;
+          }
+        }
+        if (isMultiItemCart) {
+          const titleEls = document.querySelectorAll(".sc-product-title, .a-truncate-cut");
+          titleEls.forEach((el, idx) => {
+            if (idx < 3 && el.textContent) {
+              const cleanT = el.textContent.trim();
+              if (cleanT.length > 3) cartItemsPreview.push(cleanT.slice(0, 45));
+            }
+          });
         }
         const amazonFinalPrice = detectedPrice > 0 ? detectedPrice : 32295;
         const amazonOffers = [];
@@ -8598,7 +8667,10 @@
           originalPrice: detectedOriginalPrice > 0 ? detectedOriginalPrice : void 0,
           discountPercent: detectedDiscount > 0 ? detectedDiscount : void 0,
           name: detectedName,
-          offers: amazonOffers
+          offers: amazonOffers,
+          isMultiItemCart,
+          cartItemCount,
+          cartItemsPreview
         };
       }
       const flipkartTitleSelectors = [
@@ -8772,6 +8844,30 @@
           recommended: false
         });
       }
+      const isFlipkartCartPage = window.location.href.includes("/viewcart") || window.location.href.includes("/checkout") || document.querySelector('div[class*="cartItem"], div._1AtVbE:has([class*="price"])') !== null;
+      const fkCountMatch = bodyText.match(/(?:Price|Total\s*Payable)\s*\(\s*(\d+)\s*items?\s*\)/i);
+      if (fkCountMatch && fkCountMatch[1]) {
+        const count = parseInt(fkCountMatch[1], 10);
+        if (count > 1) {
+          isMultiItemCart = true;
+          cartItemCount = count;
+        }
+      } else if (isFlipkartCartPage) {
+        const fkItems = document.querySelectorAll('div[class*="cartItem"], div._2n0QD9, a[class*="title"]');
+        if (fkItems.length > 1) {
+          isMultiItemCart = true;
+          cartItemCount = Math.min(fkItems.length, 10);
+        }
+      }
+      if (isMultiItemCart) {
+        const fkTitleEls = document.querySelectorAll('div[class*="cartItem"] a, div._2Kn22P, ._2-uGAT');
+        fkTitleEls.forEach((el, idx) => {
+          if (idx < 3 && el.textContent) {
+            const cleanT = el.textContent.trim();
+            if (cleanT.length > 3) cartItemsPreview.push(cleanT.slice(0, 45));
+          }
+        });
+      }
       return {
         surfaceType: "FLIPKART",
         price: flipkartPrice,
@@ -8779,13 +8875,18 @@
         discountPercent: detectedDiscount > 0 ? detectedDiscount : void 0,
         name: detectedName,
         advertisedMonthlyEmi: detectedEmi,
-        offers: flipkartOffers
+        offers: flipkartOffers,
+        isMultiItemCart,
+        cartItemCount,
+        cartItemsPreview
       };
     }
     let hostContainer = null;
     let shadowRoot = null;
     let reactRoot = null;
-    function injectShadowModal(surfaceType, productPrice, productName, offers, originalPrice, discountPercent, onProceedCallback, onCancelCallback) {
+    function injectShadowModal(surfaceType, productPrice, productName, offers, originalPrice, discountPercent, isMultiItemCart = false, cartItemCount = 1, cartItemsPreview = [], onProceedCallback = () => {
+    }, onCancelCallback = () => {
+    }) {
       if (document.getElementById(COMMITGUARD_HOST_ID)) {
         return;
       }
@@ -8854,6 +8955,9 @@
             originalPrice,
             discountPercent,
             scrapedOffers: offers,
+            isMultiItemCart,
+            cartItemCount,
+            cartItemsPreview,
             onProceedAndContinue: handleProceed,
             onCancelStayOnPage: handleCancel
           }
@@ -8990,6 +9094,9 @@
           productInfo.offers,
           productInfo.originalPrice,
           productInfo.discountPercent,
+          productInfo.isMultiItemCart || false,
+          productInfo.cartItemCount || 1,
+          productInfo.cartItemsPreview || [],
           // On Proceed: mark as authorized and let the click advance to next page
           () => {
             targetEl.setAttribute("data-commitguard-authorized", "true");
@@ -9052,6 +9159,9 @@
           productInfo.offers,
           productInfo.originalPrice,
           productInfo.discountPercent,
+          productInfo.isMultiItemCart || false,
+          productInfo.cartItemCount || 1,
+          productInfo.cartItemsPreview || [],
           () => {
           },
           () => {

@@ -12,6 +12,7 @@ import {
   LockInTradeoffResult,
   RealYieldResult,
   OpportunityCostResult,
+  MultiCartEmiRiskResult,
 } from './types';
 
 const GST_RATE = 0.18; // 18% statutory GST
@@ -246,5 +247,39 @@ export function calculateOpportunityCost(
     rbiRepoRate,
     yieldSpreadVsSovereign: spread,
     rupeeOpportunityCost: rupeeCost,
+  };
+}
+
+/**
+ * 5. Multi-Item Cart EMI Risk & Disqualification Evaluator
+ * Evaluates whether multi-item cart purchases meet platform minimum thresholds (₹3,000)
+ * and calculates potential standard interest leakage if mixed eligibility voids No-Cost EMI.
+ */
+export function evaluateMultiCartEmiRisk(
+  totalCartValue: number,
+  itemCount: number = 1,
+  selectedTenureMonths: number = 6,
+  standardInterestRatePct: number = 15.0
+): MultiCartEmiRiskResult {
+  const minThresholdRequired = 3000;
+  const meetsMinThreshold = totalCartValue >= minThresholdRequired;
+  const isMultiItem = itemCount > 1;
+
+  // If even 1 item is ineligible in a mixed cart, standard bank interest applies across the cart
+  const potentialInterestLeak = isMultiItem
+    ? Number((totalCartValue * (standardInterestRatePct / 100) * (selectedTenureMonths / 12)).toFixed(2))
+    : 0;
+  const potentialGstLeak = Number((potentialInterestLeak * GST_RATE).toFixed(2));
+  const totalRiskAmount = Number((potentialInterestLeak + potentialGstLeak).toFixed(2));
+
+  return {
+    isMultiItem,
+    itemCount,
+    totalCartValue,
+    meetsMinThreshold,
+    minThresholdRequired,
+    potentialInterestLeak,
+    potentialGstLeak,
+    totalRiskAmount,
   };
 }

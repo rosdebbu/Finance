@@ -176,3 +176,18 @@ export interface DirectoryRateCard {
   officialDirectPortalUrl: string;
   lastVerifiedDate: string;
 }
+
+// ==========================================
+// 7. Multi-Item Cart EMI Risk Schema
+// ==========================================
+
+export interface MultiCartEmiRiskResult {
+  isMultiItem: boolean;
+  itemCount: number;
+  totalCartValue: number;
+  meetsMinThreshold: boolean;
+  minThresholdRequired: number;
+  potentialInterestLeak: number;
+  potentialGstLeak: number;
+  totalRiskAmount: number;
+}
