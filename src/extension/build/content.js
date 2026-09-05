@@ -8507,72 +8507,18 @@
         };
       }
       if (CURRENT_SURFACE === "AMAZON") {
-        const amazonTitleSelectors = [
-          "#productTitle",
-          "#title",
-          "h1#title",
-          "span#productTitle",
-          "h1"
-        ];
-        for (const sel of amazonTitleSelectors) {
-          const el = document.querySelector(sel);
-          if (el && el.textContent) {
-            const t = el.textContent.trim();
-            if (t.length > 5) {
-              detectedName = t.slice(0, 65);
-              break;
-            }
-          }
-        }
-        if (!detectedName) detectedName = "Identified Amazon Product";
-        const amazonPriceSelectors = [
-          ".a-price .a-offscreen",
-          "#corePriceDisplay_desktop_feature_div .a-price-whole",
-          "#corePrice_feature_div .a-price-whole",
-          "#priceblock_ourprice",
-          "#priceblock_dealprice",
-          "#priceblock_saleprice",
-          "span.apexPriceToPay span.a-offscreen",
-          "span.a-price-whole",
-          "#subtotals-marketplace-table .a-text-bold"
-        ];
-        for (const sel of amazonPriceSelectors) {
-          const el = document.querySelector(sel);
-          if (el && el.textContent) {
-            const num = parseCurrencyNumber(el.textContent);
-            if (num > 100 && num < 1e7) {
-              detectedPrice = num;
-              break;
-            }
-          }
-        }
-        const amazonMrpSelectors = [
-          "span.a-price.a-text-price span.a-offscreen",
-          ".basisPrice .a-offscreen",
-          "span.a-text-price"
-        ];
-        for (const sel of amazonMrpSelectors) {
-          const el = document.querySelector(sel);
-          if (el && el.textContent) {
-            const num = parseCurrencyNumber(el.textContent);
-            if (num > detectedPrice) {
-              detectedOriginalPrice = num;
-              break;
-            }
-          }
-        }
-        const amazonSavingsEl = document.querySelector("span.savingsPercentage, .reinventPriceSavingsPercentageMargin");
-        if (amazonSavingsEl && amazonSavingsEl.textContent) {
-          const dMatch = amazonSavingsEl.textContent.match(/(\d+)%/);
-          if (dMatch && dMatch[1]) detectedDiscount = parseInt(dMatch[1], 10);
-        }
         const isAmazonCartPage = window.location.href.includes("/cart") || window.location.href.includes("/gp/cart") || window.location.href.includes("/buy/") || document.querySelector("#sc-active-cart, #gutterCartViewForm, #activeCartViewForm") !== null;
-        const subtotalMatch = bodyText.match(/Subtotal\s*\(\s*(\d+)\s*items?\s*\)/i);
-        if (subtotalMatch && subtotalMatch[1]) {
-          const count = parseInt(subtotalMatch[1], 10);
-          if (count > 1) {
-            isMultiItemCart = true;
-            cartItemCount = count;
+        const subtotalMatch = bodyText.match(/Subtotal\s*\(\s*(\d+)\s*items?\s*\)[^\d₹]*₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/i) || bodyText.match(/Subtotal[^\d₹]*₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
+        if (subtotalMatch) {
+          if (subtotalMatch[2]) {
+            const count = parseInt(subtotalMatch[1], 10);
+            if (count > 1) {
+              isMultiItemCart = true;
+              cartItemCount = count;
+            }
+            detectedPrice = parseCurrencyNumber(subtotalMatch[2]);
+          } else if (subtotalMatch[1]) {
+            detectedPrice = parseCurrencyNumber(subtotalMatch[1]);
           }
         } else if (isAmazonCartPage) {
           const cartItemEls = document.querySelectorAll(".sc-list-item, div[data-asin]");
@@ -8589,6 +8535,80 @@
               if (cleanT.length > 3) cartItemsPreview.push(cleanT.slice(0, 45));
             }
           });
+        }
+        if (isAmazonCartPage) {
+          const cartProductTitleEl = document.querySelector(
+            '.sc-product-title, .sc-grid-item-product-title, [data-name="Active Items"] .a-truncate-cut, .sc-list-item .a-truncate-cut'
+          );
+          if (cartProductTitleEl && cartProductTitleEl.textContent) {
+            const cleanTitle = cartProductTitleEl.textContent.trim();
+            if (cleanTitle.length > 3) {
+              detectedName = isMultiItemCart ? `${cleanTitle.slice(0, 45)} (+${cartItemCount - 1} item${cartItemCount > 2 ? "s" : ""} in cart)` : cleanTitle.slice(0, 65);
+            }
+          }
+          if (!detectedName) {
+            detectedName = `Amazon Cart (${cartItemCount} item${cartItemCount > 1 ? "s" : ""})`;
+          }
+        } else {
+          const amazonTitleSelectors = [
+            "#productTitle",
+            "#title",
+            "h1#title",
+            "span#productTitle"
+          ];
+          for (const sel of amazonTitleSelectors) {
+            const el = document.querySelector(sel);
+            if (el && el.textContent) {
+              const t = el.textContent.trim();
+              if (t.length > 5) {
+                detectedName = t.slice(0, 65);
+                break;
+              }
+            }
+          }
+          if (!detectedName) detectedName = "Identified Amazon Product";
+        }
+        if (!detectedPrice && isAmazonCartPage) {
+          const cartSubtotalSelectors = [
+            "#sc-subtotal-amount-activecart .sc-price",
+            "#sc-subtotal-amount-buybox .sc-price",
+            "#sc-subtotal-amount-activecart",
+            "#sc-subtotal-amount-buybox",
+            "span.sc-white-space-nowrap",
+            "#subtotals-marketplace-table .a-text-bold"
+          ];
+          for (const sel of cartSubtotalSelectors) {
+            const el = document.querySelector(sel);
+            if (el && el.textContent) {
+              const num = parseCurrencyNumber(el.textContent);
+              if (num > 100 && num < 1e7) {
+                detectedPrice = num;
+                break;
+              }
+            }
+          }
+        }
+        if (!detectedPrice) {
+          const amazonPriceSelectors = [
+            "#corePriceDisplay_desktop_feature_div .a-price-whole",
+            "#corePrice_feature_div .a-price-whole",
+            "#priceblock_ourprice",
+            "#priceblock_dealprice",
+            "#priceblock_saleprice",
+            "span.apexPriceToPay span.a-offscreen",
+            "span.a-price-whole",
+            ".a-price .a-offscreen"
+          ];
+          for (const sel of amazonPriceSelectors) {
+            const el = document.querySelector(sel);
+            if (el && el.textContent) {
+              const num = parseCurrencyNumber(el.textContent);
+              if (num > 100 && num < 1e7) {
+                detectedPrice = num;
+                break;
+              }
+            }
+          }
         }
         const amazonFinalPrice = detectedPrice > 0 ? detectedPrice : 32295;
         const amazonOffers = [];
@@ -9034,12 +9054,21 @@
         }
         const text = (curr.innerText || curr.textContent || "").trim().toLowerCase();
         const tagName = curr.tagName.toUpperCase();
+        if (/learn\s*more|emi\s*available|view\s*details|show\s*details|see\s*options|how\s*it\s*works|terms\s*&\s*conditions|terms\s*apply|accordion/i.test(text) && !/proceed|place\s*order|pay\s*now|buy\s*now|continue/i.test(text)) {
+          return null;
+        }
+        if (text.includes("emi available") || text.includes("your order qualifies for emi")) {
+          return null;
+        }
         for (const keyword of UNIVERSAL_INTERCEPT_KEYWORDS) {
           if (text === keyword || text.length < 70 && text.includes(keyword)) {
             return curr;
           }
         }
         if (/(\bemi\b|\bloan\b|\btnpl\b|pay\s*later|installment|subvention|place\s*order|proceed\s*to\s*pay|months\s*x|total\s*payable|no\s*cost\s*emi|kotak|bajaj|hdfc|icici|axis|idfc|scan\s*to\s*pay)/i.test(text) && (tagName === "BUTTON" || tagName === "A" || tagName === "LABEL" || tagName === "LI" || curr.getAttribute("role") === "button" || curr.getAttribute("role") === "radio" || curr.getAttribute("role") === "tab" || curr.classList.toString().includes("btn") || curr.classList.toString().includes("option") || curr.classList.toString().includes("item") || curr.classList.toString().includes("bank") || curr.classList.toString().includes("tenure"))) {
+          if (/available|learn\s*more|faq|policy/i.test(text)) {
+            return null;
+          }
           return curr;
         }
         if (tagName === "INPUT") {
@@ -9101,7 +9130,12 @@
           () => {
             targetEl.setAttribute("data-commitguard-authorized", "true");
             console.log("\u{1F6E1}\uFE0F CommitGuard Authorized: Continuing original payment action");
-            targetEl.click();
+            const href = targetEl.getAttribute("href");
+            if (href && href.trim().toLowerCase().startsWith("javascript:")) {
+              targetEl.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+            } else {
+              targetEl.click();
+            }
           },
           // On Cancel: do NOT mark authorized, do NOT click target, stay on current page
           () => {
