@@ -130,10 +130,23 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
       }
 
       // Live Scrape Total Due / Fare (e.g. "Total Due ₹ 13,061" or "Fare ₹ 12,352")
-      const totalDueMatch = bodyText.match(/(?:Total Due|Grand Total|Total Amount|Payable Amount|Total Fare|Trip Total)[^\d₹]*₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
-      if (totalDueMatch && totalDueMatch[1]) {
-        const num = parseCurrencyNumber(totalDueMatch[1]);
-        if (num > 500) detectedPrice = num;
+      if (clickedEl) {
+        const cText = (clickedEl.innerText || clickedEl.textContent || '').trim();
+        if (cText.includes('₹')) {
+          const m = cText.match(/(?:Pay|Book|₹)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
+          if (m && m[1]) {
+            const num = parseCurrencyNumber(m[1]);
+            if (num >= 500 && num <= 1000000) detectedPrice = num;
+          }
+        }
+      }
+
+      if (!detectedPrice) {
+        const totalDueMatch = bodyText.match(/(?:Total Due|Grand Total|Total Amount|Payable Amount|Total Fare|Trip Total)[^\d₹]*₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
+        if (totalDueMatch && totalDueMatch[1]) {
+          const num = parseCurrencyNumber(totalDueMatch[1]);
+          if (num > 500) detectedPrice = num;
+        }
       }
       if (!detectedPrice) {
         const fareEls = document.querySelectorAll('[class*="fare"], [class*="price"], [class*="total"], [class*="Total"]');
@@ -149,7 +162,32 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         }
       }
 
-      const travelPrice = detectedPrice > 0 ? detectedPrice : 13006;
+      if (detectedPrice > 0) {
+        try {
+          sessionStorage.setItem('commitguard_travel_live_price', detectedPrice.toString());
+        } catch (_) {}
+      } else {
+        try {
+          const cached = sessionStorage.getItem('commitguard_travel_live_price');
+          if (cached) {
+            const num = parseFloat(cached);
+            if (num > 500) detectedPrice = num;
+          }
+        } catch (_) {}
+      }
+
+      if (!detectedPrice) {
+        const anyPriceMatches = Array.from(bodyText.matchAll(/₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/g));
+        for (const m of anyPriceMatches) {
+          const num = parseCurrencyNumber(m[1]);
+          if (num >= 500 && num <= 1000000) {
+            detectedPrice = num;
+            break;
+          }
+        }
+      }
+
+      const travelPrice = detectedPrice;
 
       // Multi-passenger & return route detection
       const paxMatch = bodyText.match(/(\d+)\s*(?:Adults?|Travellers?|Passengers?)/i);
@@ -463,12 +501,51 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
       if (!detectedName) detectedName = 'UpGrad Executive Certification & Degree';
 
       // Scrape tuition / program fee
-      const tuitionMatch = bodyText.match(/(?:Program Fee|Total Tuition|Total Fee|Course Price|Admission Fee)[^\d₹]*₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
-      if (tuitionMatch && tuitionMatch[1]) {
-        const num = parseCurrencyNumber(tuitionMatch[1]);
-        if (num > 10000) detectedPrice = num;
+      if (clickedEl) {
+        const cText = (clickedEl.innerText || clickedEl.textContent || '').trim();
+        if (cText.includes('₹')) {
+          const m = cText.match(/(?:Pay|Enroll|₹)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
+          if (m && m[1]) {
+            const num = parseCurrencyNumber(m[1]);
+            if (num >= 5000) detectedPrice = num;
+          }
+        }
       }
-      const edTechPrice = detectedPrice > 0 ? detectedPrice : 225000;
+
+      if (!detectedPrice) {
+        const tuitionMatch = bodyText.match(/(?:Program Fee|Total Tuition|Total Fee|Course Price|Admission Fee)[^\d₹]*₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
+        if (tuitionMatch && tuitionMatch[1]) {
+          const num = parseCurrencyNumber(tuitionMatch[1]);
+          if (num > 5000) detectedPrice = num;
+        }
+      }
+
+      if (detectedPrice > 0) {
+        try {
+          sessionStorage.setItem('commitguard_edtech_live_price', detectedPrice.toString());
+        } catch (_) {}
+      } else {
+        try {
+          const cached = sessionStorage.getItem('commitguard_edtech_live_price');
+          if (cached) {
+            const num = parseFloat(cached);
+            if (num > 5000) detectedPrice = num;
+          }
+        } catch (_) {}
+      }
+
+      if (!detectedPrice) {
+        const anyPriceMatches = Array.from(bodyText.matchAll(/₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/g));
+        for (const m of anyPriceMatches) {
+          const num = parseCurrencyNumber(m[1]);
+          if (num >= 5000 && num <= 5000000) {
+            detectedPrice = num;
+            break;
+          }
+        }
+      }
+
+      const edTechPrice = detectedPrice;
       const subventionSurcharge = Math.round(edTechPrice * 0.045); // 4.5% hidden subvention markup
 
       const edTechOffers: ScrapedOffer[] = [
@@ -559,9 +636,45 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         if (detectedPrice > 0) break;
       }
 
-      const udemyPrice = detectedPrice > 0 ? detectedPrice : 539;
-      const udemyOrigPrice = detectedOriginalPrice > 0 ? detectedOriginalPrice : 3439;
-      const discountPct = detectedDiscount > 0 ? detectedDiscount : Math.round(((udemyOrigPrice - udemyPrice) / udemyOrigPrice) * 100);
+      if (clickedEl && !detectedPrice) {
+        const cText = (clickedEl.innerText || clickedEl.textContent || '').trim();
+        if (cText.includes('₹')) {
+          const m = cText.match(/(?:Buy|Pay|Checkout|₹)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
+          if (m && m[1]) {
+            const num = parseCurrencyNumber(m[1]);
+            if (num >= 100 && num <= 50000) detectedPrice = num;
+          }
+        }
+      }
+
+      if (detectedPrice > 0) {
+        try {
+          sessionStorage.setItem('commitguard_udemy_live_price', detectedPrice.toString());
+        } catch (_) {}
+      } else {
+        try {
+          const cached = sessionStorage.getItem('commitguard_udemy_live_price');
+          if (cached) {
+            const num = parseFloat(cached);
+            if (num >= 100 && num <= 50000) detectedPrice = num;
+          }
+        } catch (_) {}
+      }
+
+      if (!detectedPrice) {
+        const anyPriceMatches = Array.from(bodyText.matchAll(/₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/g));
+        for (const m of anyPriceMatches) {
+          const num = parseCurrencyNumber(m[1]);
+          if (num >= 100 && num <= 50000) {
+            detectedPrice = num;
+            break;
+          }
+        }
+      }
+
+      const udemyPrice = detectedPrice;
+      const udemyOrigPrice = detectedOriginalPrice > 0 ? detectedOriginalPrice : (udemyPrice > 0 ? Math.round(udemyPrice * 2.5) : 0);
+      const discountPct = detectedDiscount > 0 ? detectedDiscount : (udemyOrigPrice > udemyPrice && udemyOrigPrice > 0 ? Math.round(((udemyOrigPrice - udemyPrice) / udemyOrigPrice) * 100) : 0);
 
       const udemyOffers: ScrapedOffer[] = [
         {
@@ -620,21 +733,149 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         window.location.href.includes('/buy/') ||
         document.querySelector('#sc-active-cart, #gutterCartViewForm, #activeCartViewForm') !== null;
 
-      const subtotalMatch = bodyText.match(/Subtotal\s*\(\s*(\d+)\s*items?\s*\)[^\d₹]*₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/i) ||
-                            bodyText.match(/Subtotal[^\d₹]*₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
-      
-      if (subtotalMatch) {
-        if (subtotalMatch[2]) {
-          const count = parseInt(subtotalMatch[1], 10);
-          if (count > 1) {
-            isMultiItemCart = true;
-            cartItemCount = count;
-          }
-          detectedPrice = parseCurrencyNumber(subtotalMatch[2]);
-        } else if (subtotalMatch[1]) {
-          detectedPrice = parseCurrencyNumber(subtotalMatch[1]);
+      // =========================================================================
+      // 5-LAYER BULLETPROOF LIVE PRICE EXTRACTION FOR AMAZON
+      // Eliminates all hardcoded fallbacks and accurately captures checkout totals
+      // =========================================================================
+
+      // Layer 1: Clicked Action Element & Button Introspection (Pay ₹..., Payment of ₹...)
+      if (clickedEl) {
+        const candidateTexts = [
+          clickedEl.innerText || '',
+          clickedEl.textContent || '',
+          (clickedEl as HTMLInputElement).value || '',
+          clickedEl.getAttribute('aria-label') || '',
+          clickedEl.getAttribute('title') || '',
+        ];
+        const parentBtn = clickedEl.closest('button, a, input[type="submit"], input[type="button"], [role="button"], form');
+        if (parentBtn) {
+          candidateTexts.push(
+            parentBtn.textContent || '',
+            (parentBtn as HTMLInputElement).value || '',
+            parentBtn.getAttribute('aria-label') || ''
+          );
         }
-      } else if (isAmazonCartPage) {
+        for (const t of candidateTexts) {
+          if (t && t.includes('₹')) {
+            const m = t.match(/(?:Pay|Payment\s*of|Total|₹)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
+            if (m && m[1]) {
+              const num = parseCurrencyNumber(m[1]);
+              if (num >= 50 && num < 10000000) {
+                detectedPrice = num;
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      // Layer 2: Authoritative Live Page Text Regexes (Checkout Order Total, Payment of ₹, Subtotal)
+      if (!detectedPrice) {
+        const checkoutPricePatterns = [
+          /(?:Order\s*Total|Grand\s*Total|Final\s*Total|Total\s*Payable|Amount\s*Payable)[^\d₹]*₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
+          /(?:Payment\s*of)\s*₹?\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
+          /\bPay\s*₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
+          /(?:Subtotal\s*\(\s*(\d+)\s*items?\s*\))[^\d₹]*₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
+          /Subtotal[^\d₹]*₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
+          /\bTotal:\s*₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
+        ];
+        for (const pat of checkoutPricePatterns) {
+          const match = bodyText.match(pat);
+          if (match) {
+            const priceStr = match[2] || match[1];
+            if (priceStr) {
+              const num = parseCurrencyNumber(priceStr);
+              if (num >= 50 && num < 10000000) {
+                detectedPrice = num;
+                if (match[2] && match[1]) {
+                  const count = parseInt(match[1], 10);
+                  if (count > 1) {
+                    isMultiItemCart = true;
+                    cartItemCount = count;
+                  }
+                }
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      // Layer 3: Authoritative Checkout & Order Summary DOM Selectors
+      if (!detectedPrice) {
+        const amazonCheckoutAndCartSelectors = [
+          '#subtotals-marketplace-table tr:last-child .a-color-price',
+          '#subtotals-marketplace-table .grand-total-price',
+          'td.grand-total-price',
+          '.order-summary-grand-total',
+          'span.order-summary-grand-total',
+          '[data-testid="order-summary-total"]',
+          'span.a-color-price.a-text-bold',
+          '#subtotals-marketplace-table .a-color-price',
+          '#subtotals-marketplace-table .a-text-bold',
+          '.spc-order-summary .a-color-price',
+          'div[id*="order-summary"] .a-color-price',
+          '.pmts-total-amount',
+          '#sc-subtotal-amount-activecart .sc-price',
+          '#sc-subtotal-amount-buybox .sc-price',
+          '#sc-subtotal-amount-activecart',
+          '#sc-subtotal-amount-buybox',
+          'span.sc-white-space-nowrap',
+          '#corePriceDisplay_desktop_feature_div .a-price-whole',
+          '#corePrice_feature_div .a-price-whole',
+          '#priceblock_ourprice',
+          '#priceblock_dealprice',
+          '#priceblock_saleprice',
+          'span.apexPriceToPay span.a-offscreen',
+          'span.a-price-whole',
+          '.a-price .a-offscreen',
+        ];
+        for (const sel of amazonCheckoutAndCartSelectors) {
+          const els = document.querySelectorAll(sel);
+          for (const el of Array.from(els)) {
+            if (el && el.textContent) {
+              const num = parseCurrencyNumber(el.textContent);
+              if (num >= 50 && num < 10000000) {
+                detectedPrice = num;
+                break;
+              }
+            }
+          }
+          if (detectedPrice > 0) break;
+        }
+      }
+
+      // Layer 4: Cross-Step Checkout Session Continuity (sessionStorage)
+      if (detectedPrice > 0) {
+        try {
+          sessionStorage.setItem('commitguard_amazon_live_price', detectedPrice.toString());
+        } catch (_) {}
+      } else {
+        try {
+          const cachedPriceStr = sessionStorage.getItem('commitguard_amazon_live_price');
+          if (cachedPriceStr) {
+            const cachedNum = parseFloat(cachedPriceStr);
+            if (cachedNum >= 50 && cachedNum < 10000000) {
+              detectedPrice = cachedNum;
+            }
+          }
+        } catch (_) {}
+      }
+
+      // Layer 5: Fallback scan for any visible currency figure on page
+      if (!detectedPrice) {
+        const anyPriceMatches = Array.from(bodyText.matchAll(/₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/g));
+        for (const m of anyPriceMatches) {
+          const num = parseCurrencyNumber(m[1]);
+          if (num >= 100 && num < 10000000) {
+            detectedPrice = num;
+            break;
+          }
+        }
+      }
+
+      // Check item count on cart page if not captured via regex
+      if (isAmazonCartPage && !isMultiItemCart) {
         const cartItemEls = document.querySelectorAll('.sc-list-item, div[data-asin]');
         if (cartItemEls.length > 1) {
           isMultiItemCart = true;
@@ -652,7 +893,7 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         });
       }
 
-      // Title determination on Amazon
+      // Title determination on Amazon (Product page, Cart, or Checkout)
       if (isAmazonCartPage) {
         const cartProductTitleEl = document.querySelector(
           '.sc-product-title, .sc-grid-item-product-title, [data-name="Active Items"] .a-truncate-cut, .sc-list-item .a-truncate-cut'
@@ -670,6 +911,10 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         }
       } else {
         const amazonTitleSelectors = [
+          '.item-row-title',
+          '.spc-product-title',
+          '[data-testid="item-title"]',
+          '.shipping-group .a-text-bold',
           '#productTitle',
           '#title',
           'h1#title',
@@ -679,62 +924,29 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
           const el = document.querySelector(sel);
           if (el && el.textContent) {
             const t = el.textContent.trim();
-            if (t.length > 5) {
+            if (t.length > 3) {
               detectedName = t.slice(0, 65);
               break;
             }
           }
         }
-        if (!detectedName) detectedName = 'Identified Amazon Product';
       }
 
-      // Authoritative Price Determination for Amazon Cart
-      if (!detectedPrice && isAmazonCartPage) {
-        const cartSubtotalSelectors = [
-          '#sc-subtotal-amount-activecart .sc-price',
-          '#sc-subtotal-amount-buybox .sc-price',
-          '#sc-subtotal-amount-activecart',
-          '#sc-subtotal-amount-buybox',
-          'span.sc-white-space-nowrap',
-          '#subtotals-marketplace-table .a-text-bold',
-        ];
-        for (const sel of cartSubtotalSelectors) {
-          const el = document.querySelector(sel);
-          if (el && el.textContent) {
-            const num = parseCurrencyNumber(el.textContent);
-            if (num > 100 && num < 10000000) {
-              detectedPrice = num;
-              break;
-            }
-          }
-        }
+      // Session continuity for product/cart title
+      if (detectedName && detectedName !== 'Identified Amazon Product') {
+        try {
+          sessionStorage.setItem('commitguard_amazon_live_title', detectedName);
+        } catch (_) {}
+      } else {
+        try {
+          const cachedTitle = sessionStorage.getItem('commitguard_amazon_live_title');
+          if (cachedTitle) detectedName = cachedTitle;
+        } catch (_) {}
       }
+      if (!detectedName) detectedName = 'Identified Amazon Product';
 
-      // Only if not on a cart page, fall back to individual product page price selectors
-      if (!detectedPrice) {
-        const amazonPriceSelectors = [
-          '#corePriceDisplay_desktop_feature_div .a-price-whole',
-          '#corePrice_feature_div .a-price-whole',
-          '#priceblock_ourprice',
-          '#priceblock_dealprice',
-          '#priceblock_saleprice',
-          'span.apexPriceToPay span.a-offscreen',
-          'span.a-price-whole',
-          '.a-price .a-offscreen',
-        ];
-        for (const sel of amazonPriceSelectors) {
-          const el = document.querySelector(sel);
-          if (el && el.textContent) {
-            const num = parseCurrencyNumber(el.textContent);
-            if (num > 100 && num < 10000000) {
-              detectedPrice = num;
-              break;
-            }
-          }
-        }
-      }
-
-      const amazonFinalPrice = detectedPrice > 0 ? detectedPrice : 32295;
+      // ZERO HARDCODED FALLBACK: Authoritative detected price
+      const amazonFinalPrice = detectedPrice;
       const amazonOffers: ScrapedOffer[] = [];
 
       // 1. Direct UPI / Amazon Pay Balance (Zero Debt)
@@ -932,7 +1144,32 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
       detectedDiscount = parseInt(discountMatch[1], 10);
     }
 
-    const flipkartPrice = detectedPrice > 0 ? detectedPrice : 19999;
+    if (clickedEl && !detectedPrice) {
+      const cText = (clickedEl.innerText || clickedEl.textContent || '').trim();
+      if (cText.includes('₹')) {
+        const m = cText.match(/(?:Pay|Buy|Total|₹)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
+        if (m && m[1]) {
+          const num = parseCurrencyNumber(m[1]);
+          if (num >= 500 && num <= 5000000) detectedPrice = num;
+        }
+      }
+    }
+
+    if (detectedPrice > 0) {
+      try {
+        sessionStorage.setItem('commitguard_flipkart_live_price', detectedPrice.toString());
+      } catch (_) {}
+    } else {
+      try {
+        const cached = sessionStorage.getItem('commitguard_flipkart_live_price');
+        if (cached) {
+          const num = parseFloat(cached);
+          if (num >= 500 && num <= 5000000) detectedPrice = num;
+        }
+      } catch (_) {}
+    }
+
+    const flipkartPrice = detectedPrice;
 
     // Check which specific payment card or EMI option user clicked
     let clickedFlipkartCard = '';
