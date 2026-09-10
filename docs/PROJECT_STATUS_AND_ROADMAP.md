@@ -4,6 +4,24 @@
 
 ---
 
+## 📚 Master Documentation & Implementation Index
+
+All core implementation plans, deep research reports, architecture specs, and walkthroughs are permanently stored inside the project [`docs/`](file:///c:/Users/Anshumaan/Documents/GitHub/Finance/docs) directory:
+
+| Document | Purpose & Contents |
+| :--- | :--- |
+| [**`PROJECT_STATUS_AND_ROADMAP.md`**](file:///c:/Users/Anshumaan/Documents/GitHub/Finance/docs/PROJECT_STATUS_AND_ROADMAP.md) | **Master Tracker:** Complete summary of finished work, active scope, and remaining roadmap items. |
+| [**`RESEARCH_AND_FEATURE_PLAN.md`**](file:///c:/Users/Anshumaan/Documents/GitHub/Finance/docs/RESEARCH_AND_FEATURE_PLAN.md) | **Deep Research:** Bank MITC clauses, Reddit `r/CreditCardsIndia` community data, Multi-cart poison pill, Forfeited rewards math, Pre-checkout CIBIL CUR impact, and Freelancer GST ITC claim. |
+| [**`LIVE_PRICE_SCRAPING_PLAN.md`**](file:///c:/Users/Anshumaan/Documents/GitHub/Finance/docs/LIVE_PRICE_SCRAPING_PLAN.md) | **Scraping Architecture:** 5-layer dynamic price extraction engine, session continuity (`sessionStorage`), and eradication of all hardcoded dummy fallback numbers (`32295`, `19999`, etc.). |
+| [**`WALKTHROUGH.md`**](file:///c:/Users/Anshumaan/Documents/GitHub/Finance/docs/WALKTHROUGH.md) | **Verification Log:** Build logs, test results, Udemy cache isolation fix, and prototype scope lockdown. |
+| [**`PRD.md`**](file:///c:/Users/Anshumaan/Documents/GitHub/Finance/docs/PRD.md) | **Product Requirements:** Complete PRD with problem statements, user personas, mathematical proofs, and safety guardrails. |
+| [**`SYSTEM_WORKING_BLUEPRINT.md`**](file:///c:/Users/Anshumaan/Documents/GitHub/Finance/docs/SYSTEM_WORKING_BLUEPRINT.md) | **System Architecture:** End-to-end component breakdown, data flows, and Shadow DOM injection mechanics. |
+| [**`EXTENSION_GUIDE.md`**](file:///c:/Users/Anshumaan/Documents/GitHub/Finance/docs/EXTENSION_GUIDE.md) | **Extension Manual:** Developer and user guide for running and testing the Chrome Extension. |
+| [**`UI_SMOOTHNESS_GUIDE.md`**](file:///c:/Users/Anshumaan/Documents/GitHub/Finance/docs/UI_SMOOTHNESS_GUIDE.md) | **Design Guidelines:** Micro-interactions, animations, and premium glassmorphism styling rules. |
+| [**`TECH_STACK.md`**](file:///c:/Users/Anshumaan/Documents/GitHub/Finance/docs/TECH_STACK.md) | **Technology Overview:** Dependencies, deterministic engine design, and bundler configurations. |
+
+---
+
 ## 📋 Part 1: Everything Completed So Far
 
 ### 1. Core Deterministic Financial Engine (`src/lib/financial-engine.ts`)
