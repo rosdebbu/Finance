@@ -8124,7 +8124,7 @@
           }
         }
         if (!detectedName) {
-          const routeMatch = bodyText.match(/([A-Za-z\s]+(?:\([A-Z]{3}\))?\s*(?:→|->|to|-)\s*[A-Za-z\s]+(?:\([A-Z]{3}\))?)/i);
+          const routeMatch = bodyText.match(/([A-Za-z\s]{2,30}\([A-Z]{3}\)\s*(?:→|->|to)\s*[A-Za-z\s]{2,30}\([A-Z]{3}\))/i);
           if (routeMatch && routeMatch[1]) {
             detectedName = `MakeMyTrip: ${routeMatch[1].trim()}`;
           }
@@ -8178,8 +8178,10 @@
           }
         }
         if (!detectedPrice) {
-          const anyPriceMatches = Array.from(bodyText.matchAll(/₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/g));
-          for (const m of anyPriceMatches) {
+          const contextualPriceMatches = Array.from(
+            bodyText.matchAll(/(?:fare|total|amount|payable|due|price)[^\d₹]{0,20}₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/gi)
+          );
+          for (const m of contextualPriceMatches) {
             const num = parseCurrencyNumber(m[1]);
             if (num >= 500 && num <= 1e6) {
               detectedPrice = num;
@@ -8574,8 +8576,7 @@
         if (!detectedPrice) {
           const udemyRegexPatterns = [
             /(?:Total|Order\s*Total|Total\s*Amount)[^\d₹$€£]*[₹$€£]\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
-            /(?:Current\s*price)[^\d₹$€£]*[₹$€£]\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
-            /[₹]\s*([0-9,]+(?:\.[0-9]{1,2})?)/
+            /(?:Current\s*price)[^\d₹$€£]*[₹$€£]\s*([0-9,]+(?:\.[0-9]{1,2})?)/i
           ];
           for (const pat of udemyRegexPatterns) {
             const m = bodyText.match(pat);
@@ -8607,7 +8608,7 @@
           }
         }
         const udemyPrice = detectedPrice;
-        const udemyOrigPrice = detectedOriginalPrice > 0 ? detectedOriginalPrice : udemyPrice > 0 ? Math.round(udemyPrice * 2.5) : 0;
+        const udemyOrigPrice = detectedOriginalPrice > 0 ? detectedOriginalPrice : 0;
         const discountPct = detectedDiscount > 0 ? detectedDiscount : udemyOrigPrice > udemyPrice && udemyOrigPrice > 0 ? Math.round((udemyOrigPrice - udemyPrice) / udemyOrigPrice * 100) : 0;
         const udemyOffers = [
           {
