@@ -11,7 +11,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#080c14",
+        background: "#07090e",
+        obsidian: {
+          950: "#05070a",
+          900: "#07090e",
+          850: "#0b0e17",
+          800: "#0f1422",
+          700: "#171f33",
+          600: "#222c46",
+        },
         surface: {
           50: "#141c2e",
           100: "#0f1624",
@@ -19,11 +27,25 @@ const config: Config = {
           300: "#060910",
         },
         brand: {
-          50: "#eef2ff",
-          100: "#e0e7ff",
-          500: "#6366f1",
-          600: "#4f46e5",
-          700: "#4338ca",
+          50: "#fff7ed",
+          100: "#ffedd5",
+          400: "#fb923c",
+          500: "#f97316",
+          600: "#ea580c",
+          700: "#c2410c",
+        },
+        sunset: {
+          light: "#fed7aa",
+          DEFAULT: "#f97316",
+          dark: "#ea580c",
+          deep: "#9a3412",
+          glow: "rgba(249, 115, 22, 0.28)",
+        },
+        frost: {
+          mist: "rgba(148, 163, 184, 0.12)",
+          light: "#cbd5e1",
+          DEFAULT: "#94a3b8",
+          dark: "#64748b",
         },
         accent: {
           emerald: "#10b981",
@@ -44,7 +66,9 @@ const config: Config = {
         },
       },
       boxShadow: {
-        glow: "0 0 25px -5px rgba(99, 102, 241, 0.25)",
+        glow: "0 0 35px -5px rgba(249, 115, 22, 0.35)",
+        "glow-sunset": "0 0 45px -10px rgba(234, 88, 12, 0.4)",
+        "glow-frost": "0 0 35px -10px rgba(148, 163, 184, 0.2)",
         "glow-emerald": "0 0 25px -5px rgba(16, 185, 129, 0.25)",
         "glow-amber": "0 0 25px -5px rgba(245, 158, 11, 0.25)",
       },
