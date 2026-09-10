@@ -13,9 +13,9 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
 
   const COMMITGUARD_HOST_ID = 'commitguard-extension-root';
 
-  type InterceptorSurface = 'AMAZON' | 'FLIPKART' | 'TRAVEL' | 'EDTECH' | 'UDEMY';
+  type InterceptorSurface = 'AMAZON' | 'FLIPKART' | 'TRAVEL' | 'UDEMY';
 
-  function detectSurfaceType(): InterceptorSurface {
+  function detectSurfaceType(): InterceptorSurface | null {
     const host = window.location.hostname.toLowerCase();
     if (host.includes('amazon')) {
       return 'AMAZON';
@@ -26,16 +26,17 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
     if (host.includes('udemy')) {
       return 'UDEMY';
     }
-    if (host.includes('makemytrip') || host.includes('cleartrip') || host.includes('yatra') || host.includes('goibibo')) {
+    if (host.includes('makemytrip')) {
       return 'TRAVEL';
     }
-    if (host.includes('upgrad') || host.includes('scaler') || host.includes('simplilearn') || host.includes('coursera')) {
-      return 'EDTECH';
-    }
-    return 'FLIPKART';
+    return null;
   }
 
   const CURRENT_SURFACE = detectSurfaceType();
+  if (!CURRENT_SURFACE) {
+    // Current prototype is strictly scoped to Flipkart, Amazon, Udemy, and MakeMyTrip
+    return;
+  }
   console.log(`🛡️ CommitGuard Surface Detected: [${CURRENT_SURFACE}] on ${window.location.hostname}`);
 
   interface ScrapedOffer {
@@ -484,191 +485,254 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
     }
 
     // ==========================================
-    // 2. SURFACE: EDTECH (UpGrad / Scaler)
-    // ==========================================
-    if (CURRENT_SURFACE === 'EDTECH') {
-      const edTechTitleSelectors = ['h1', '.program-title', '.course-title', '.cohort-header', '.hero-title'];
-      for (const sel of edTechTitleSelectors) {
-        const el = document.querySelector(sel);
-        if (el && el.textContent) {
-          const t = el.textContent.trim();
-          if (t.length > 5) {
-            detectedName = t.slice(0, 60);
-            break;
-          }
-        }
-      }
-      if (!detectedName) detectedName = 'UpGrad Executive Certification & Degree';
-
-      // Scrape tuition / program fee
-      if (clickedEl) {
-        const cText = (clickedEl.innerText || clickedEl.textContent || '').trim();
-        if (cText.includes('₹')) {
-          const m = cText.match(/(?:Pay|Enroll|₹)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
-          if (m && m[1]) {
-            const num = parseCurrencyNumber(m[1]);
-            if (num >= 5000) detectedPrice = num;
-          }
-        }
-      }
-
-      if (!detectedPrice) {
-        const tuitionMatch = bodyText.match(/(?:Program Fee|Total Tuition|Total Fee|Course Price|Admission Fee)[^\d₹]*₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
-        if (tuitionMatch && tuitionMatch[1]) {
-          const num = parseCurrencyNumber(tuitionMatch[1]);
-          if (num > 5000) detectedPrice = num;
-        }
-      }
-
-      if (detectedPrice > 0) {
-        try {
-          sessionStorage.setItem('commitguard_edtech_live_price', detectedPrice.toString());
-        } catch (_) {}
-      } else {
-        try {
-          const cached = sessionStorage.getItem('commitguard_edtech_live_price');
-          if (cached) {
-            const num = parseFloat(cached);
-            if (num > 5000) detectedPrice = num;
-          }
-        } catch (_) {}
-      }
-
-      if (!detectedPrice) {
-        const anyPriceMatches = Array.from(bodyText.matchAll(/₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/g));
-        for (const m of anyPriceMatches) {
-          const num = parseCurrencyNumber(m[1]);
-          if (num >= 5000 && num <= 5000000) {
-            detectedPrice = num;
-            break;
-          }
-        }
-      }
-
-      const edTechPrice = detectedPrice;
-      const subventionSurcharge = Math.round(edTechPrice * 0.045); // 4.5% hidden subvention markup
-
-      const edTechOffers: ScrapedOffer[] = [
-        {
-          id: 'upfront-edtech',
-          bankOrCard: 'Upfront NEFT/UPI with Corporate Sponsorship Discount',
-          description: 'Single full tuition payment via direct bank wire',
-          effectiveBenefit: `Save ₹${subventionSurcharge.toLocaleString('en-IN')} upfront discount`,
-          rating: 'BEST',
-          reason: 'Negotiate the 4.5% merchant subvention fee directly off the course sticker price.',
-          netPrice: edTechPrice - subventionSurcharge,
-          recommended: true,
-        },
-        {
-          id: 'subvention-loan',
-          bankOrCard: '0% Interest Education NBFC Loan (Propelld / LiquiLoans)',
-          description: '18-24 Month NBFC subvention loan contract',
-          effectiveBenefit: `₹${Math.round(edTechPrice / 18).toLocaleString('en-IN')}/mo with hidden subvention drag`,
-          rating: 'AVOID',
-          reason: `Hidden 4.5% (₹${subventionSurcharge.toLocaleString('en-IN')}) subvention cost baked into course price + processing fees.`,
-          netPrice: edTechPrice + 3500,
-          recommended: false,
-        },
-      ];
-
-      return {
-        surfaceType: 'EDTECH',
-        price: edTechPrice,
-        name: detectedName,
-        offers: edTechOffers,
-        isMultiItemCart,
-        cartItemCount,
-        cartItemsPreview,
-      };
-    }
-
-    // ==========================================
-    // 3. SURFACE: UDEMY (Online Course Interceptor)
+    // 2. SURFACE: UDEMY (Online Course Interceptor)
     // ==========================================
     if (CURRENT_SURFACE === 'UDEMY') {
-      const udemyTitleSelectors = [
-        'h1[data-purpose="lead-title"]',
-        'h1.clp-lead__title',
-        'h1',
-        '[data-purpose="course-header-title"]',
-        '.course-title',
+      const pathname = window.location.pathname;
+      const isUdemyCart = pathname.includes('/cart') || pathname.includes('/checkout');
+      const courseSlugMatch = pathname.match(/\/course\/([^\/\?#]+)/);
+      const courseSlug = courseSlugMatch ? courseSlugMatch[1] : '';
+
+      // Clear legacy unkeyed cross-course pollution
+      try {
+        sessionStorage.removeItem('commitguard_udemy_live_price');
+      } catch (_) {}
+
+      // -----------------------------------------------------------
+      // TITLE DETERMINATION (100% Dynamic, Zero Hardcoded Strings)
+      // -----------------------------------------------------------
+      // 1. OpenGraph Meta Title (Extremely reliable on Udemy)
+      const ogTitleMeta = document.querySelector('meta[property="og:title"]');
+      if (ogTitleMeta) {
+        const ogContent = (ogTitleMeta.getAttribute('content') || '').trim();
+        if (ogContent && ogContent.length > 3) {
+          detectedName = ogContent.replace(/\|?\s*Udemy.*$/i, '').trim().slice(0, 75);
+        }
+      }
+
+      // 2. DOM Headings (Course landing, cart item, or checkout title)
+      if (!detectedName) {
+        const udemyTitleSelectors = [
+          'h1[data-purpose="lead-title"]',
+          'h1.clp-lead__title',
+          '[data-purpose="course-header-title"]',
+          '[data-purpose="shopping-cart-item-title"]',
+          '.cart-item-component--title',
+          '.course-title',
+          'h1',
+        ];
+        for (const sel of udemyTitleSelectors) {
+          const el = document.querySelector(sel);
+          if (el && el.textContent) {
+            const t = el.textContent.trim();
+            if (t.length > 3 && !t.toLowerCase().includes('shopping cart') && !t.toLowerCase().includes('checkout')) {
+              detectedName = t.slice(0, 75);
+              break;
+            }
+          }
+        }
+      }
+
+      // 3. Clean Title from Document Title
+      if (!detectedName && document.title) {
+        const cleanDocTitle = document.title
+          .replace(/\|?\s*Udemy.*$/i, '')
+          .replace(/Online Courses.*$/i, '')
+          .trim();
+        if (cleanDocTitle.length > 3 && !cleanDocTitle.toLowerCase().includes('shopping cart')) {
+          detectedName = cleanDocTitle.slice(0, 75);
+        }
+      }
+
+      // 4. Humanize Course URL Slug (e.g. "the-complete-web-development-bootcamp" -> "The Complete Web Development Bootcamp")
+      if (!detectedName && courseSlug) {
+        detectedName = courseSlug
+          .split('-')
+          .filter(Boolean)
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(' ')
+          .slice(0, 75);
+      }
+
+      if (!detectedName) {
+        detectedName = isUdemyCart ? 'Udemy Cart Checkout' : 'Selected Udemy Course';
+      }
+
+      // -----------------------------------------------------------
+      // MULTI-ITEM CART DETECTION ON UDEMY
+      // -----------------------------------------------------------
+      if (isUdemyCart) {
+        const cartItemEls = document.querySelectorAll(
+          '[data-purpose="shopping-cart-item"], .cart-item-component, [class*="shopping-cart-item"]'
+        );
+        if (cartItemEls.length > 1) {
+          isMultiItemCart = true;
+          cartItemCount = cartItemEls.length;
+        }
+        cartItemEls.forEach((el, idx) => {
+          if (idx < 3) {
+            const titleEl = el.querySelector('[data-purpose="shopping-cart-item-title"], a, h3');
+            if (titleEl && titleEl.textContent) {
+              const cleanT = titleEl.textContent.trim();
+              if (cleanT.length > 3) cartItemsPreview.push(cleanT.slice(0, 45));
+            }
+          }
+        });
+      }
+
+      // -----------------------------------------------------------
+      // 5-LAYER LIVE PRICE EXTRACTION FOR UDEMY
+      // -----------------------------------------------------------
+
+      // Layer 1: Schema.org JSON-LD structured data (Immune to CSS obfuscation)
+      const ldScripts = document.querySelectorAll('script[type="application/ld+json"]');
+      for (const s of Array.from(ldScripts)) {
+        try {
+          const raw = s.textContent || '';
+          if (raw.includes('offers') || raw.includes('price')) {
+            const data = JSON.parse(raw);
+            const items = Array.isArray(data) ? data : [data];
+            for (const item of items) {
+              const offer = Array.isArray(item.offers) ? item.offers[0] : item.offers;
+              if (offer && offer.price) {
+                const p = Math.round(Number(offer.price));
+                if (p >= 100 && p <= 100000) {
+                  detectedPrice = p;
+                  break;
+                }
+              }
+            }
+            if (detectedPrice > 0) break;
+          }
+        } catch (_) {}
+      }
+
+      // Layer 2: Clicked Element / Purchase Button / Checkout Button
+      if (clickedEl && !detectedPrice) {
+        const candidateTexts = [
+          clickedEl.innerText || '',
+          clickedEl.textContent || '',
+          (clickedEl as HTMLInputElement).value || '',
+          clickedEl.getAttribute('aria-label') || '',
+        ];
+        const parentBtn = clickedEl.closest('button, a, [role="button"], form, [class*="buy-box"], [class*="order-summary"]');
+        if (parentBtn) {
+          candidateTexts.push(
+            parentBtn.textContent || '',
+            (parentBtn as HTMLInputElement).value || '',
+            parentBtn.getAttribute('aria-label') || ''
+          );
+        }
+        for (const t of candidateTexts) {
+          if (t && (t.includes('₹') || t.includes('$') || t.includes('€') || t.includes('£'))) {
+            const m = t.match(/[₹$€£]\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
+            if (m && m[1]) {
+              const num = parseCurrencyNumber(m[1]);
+              if (num >= 100 && num <= 100000) {
+                detectedPrice = num;
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      // Layer 3: Modern Udemy DOM Price Selectors (Course Landing, Cart, & Checkout)
+      if (!detectedPrice) {
+        const udemyPriceSelectors = [
+          '[data-purpose="total-price"] span:not(.sr-only)',
+          '[data-purpose="summary-total"]',
+          '[data-purpose="shopping-cart-total"]',
+          '[data-purpose="course-price-text"] span:not(.sr-only)',
+          '[data-purpose="course-price-text"]',
+          '[data-purpose="current-price"]',
+          '.price-text--price-part--Tu6MH',
+          'div[class*="price-text--price-part"] span:not(.sr-only)',
+          'div[data-purpose="course-price-text"] span:not(.sr-only)',
+          '.base-price-text',
+          '.clp-lead__price',
+          '.shopping-item__price',
+          'div[class*="order-summary"] [class*="total-price"]',
+          'div[class*="order-summary"] [class*="price"]',
+          'div[data-purpose*="price"] span',
+        ];
+
+        for (const sel of udemyPriceSelectors) {
+          const els = document.querySelectorAll(sel);
+          for (const el of Array.from(els)) {
+            const text = el.textContent || '';
+            if (text.includes('₹') || text.includes('$') || text.includes('€') || text.includes('£')) {
+              const num = parseCurrencyNumber(text);
+              if (num >= 100 && num <= 100000) {
+                detectedPrice = num;
+                break;
+              }
+            }
+          }
+          if (detectedPrice > 0) break;
+        }
+      }
+
+      // Scrape MRP (struck-through/original price)
+      const udemyMrpSelectors = [
+        '[data-purpose="original-price-container"] s',
+        '[data-purpose="course-old-price-text"]',
+        'div[data-purpose="course-price-text"] s',
+        'div[data-purpose="course-price-text"] del',
+        's span:not(.sr-only)',
+        'del span',
+        '.original-price-text',
       ];
-      for (const sel of udemyTitleSelectors) {
+      for (const sel of udemyMrpSelectors) {
         const el = document.querySelector(sel);
         if (el && el.textContent) {
-          const t = el.textContent.trim();
-          if (t.length > 3) {
-            detectedName = t.slice(0, 60);
+          const num = parseCurrencyNumber(el.textContent);
+          if (num > (detectedPrice || 0)) {
+            detectedOriginalPrice = num;
             break;
           }
         }
       }
-      if (!detectedName) detectedName = 'Fundamentals of Backend Engineering';
 
-      const purchaseContainer =
-        (clickedEl && clickedEl.closest('[class*="buy-box"], [class*="sidebar"], [class*="purchase-section"], [class*="clp-lead"]')) ||
-        document.querySelector('[data-purpose="sidebar-container"]') ||
-        document.querySelector('[class*="sidebar-container"]') ||
-        document.querySelector('[class*="buy-box"]') ||
-        document.body;
-
-      const udemyPriceSelectors = [
-        '[data-purpose="course-price-text"] span:not(.sr-only)',
-        '[data-purpose="course-price-text"]',
-        '.price-text--price-part--Tu6MH',
-        'div[data-purpose="course-price-text"] span',
-        '.base-price-text',
-        '.clp-lead__price',
-      ];
-
-      for (const sel of udemyPriceSelectors) {
-        const els = purchaseContainer.querySelectorAll(sel);
-        for (const el of Array.from(els)) {
-          const text = el.textContent || '';
-          if (text.includes('₹')) {
-            const num = parseCurrencyNumber(text);
-            if (num >= 200 && num <= 20000) {
+      // Layer 4: Live Page Text Regexes (Checkout Order Total, Total, Current price)
+      if (!detectedPrice) {
+        const udemyRegexPatterns = [
+          /(?:Total|Order\s*Total|Total\s*Amount)[^\d₹$€£]*[₹$€£]\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
+          /(?:Current\s*price)[^\d₹$€£]*[₹$€£]\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
+          /[₹]\s*([0-9,]+(?:\.[0-9]{1,2})?)/,
+        ];
+        for (const pat of udemyRegexPatterns) {
+          const m = bodyText.match(pat);
+          if (m && m[1]) {
+            const num = parseCurrencyNumber(m[1]);
+            if (num >= 100 && num <= 100000) {
               detectedPrice = num;
               break;
             }
           }
         }
-        if (detectedPrice > 0) break;
       }
 
-      if (clickedEl && !detectedPrice) {
-        const cText = (clickedEl.innerText || clickedEl.textContent || '').trim();
-        if (cText.includes('₹')) {
-          const m = cText.match(/(?:Buy|Pay|Checkout|₹)\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
-          if (m && m[1]) {
-            const num = parseCurrencyNumber(m[1]);
-            if (num >= 100 && num <= 50000) detectedPrice = num;
-          }
-        }
-      }
+      // Layer 5: Course-Keyed or Cart-Keyed Session Continuity (ZERO Cross-Course Pollution)
+      const storageKey = isUdemyCart
+        ? 'commitguard_udemy_cart_total'
+        : courseSlug
+        ? `commitguard_udemy_price_${courseSlug}`
+        : '';
 
-      if (detectedPrice > 0) {
-        try {
-          sessionStorage.setItem('commitguard_udemy_live_price', detectedPrice.toString());
-        } catch (_) {}
-      } else {
-        try {
-          const cached = sessionStorage.getItem('commitguard_udemy_live_price');
-          if (cached) {
-            const num = parseFloat(cached);
-            if (num >= 100 && num <= 50000) detectedPrice = num;
-          }
-        } catch (_) {}
-      }
-
-      if (!detectedPrice) {
-        const anyPriceMatches = Array.from(bodyText.matchAll(/₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/g));
-        for (const m of anyPriceMatches) {
-          const num = parseCurrencyNumber(m[1]);
-          if (num >= 100 && num <= 50000) {
-            detectedPrice = num;
-            break;
-          }
+      if (storageKey) {
+        if (detectedPrice > 0) {
+          try {
+            sessionStorage.setItem(storageKey, detectedPrice.toString());
+          } catch (_) {}
+        } else {
+          try {
+            const cached = sessionStorage.getItem(storageKey);
+            if (cached) {
+              const num = parseFloat(cached);
+              if (num >= 100 && num <= 100000) detectedPrice = num;
+            }
+          } catch (_) {}
         }
       }
 

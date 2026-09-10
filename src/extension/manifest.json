@@ -11,8 +11,6 @@
     "*://*.amazon.in/*",
     "*://*.flipkart.com/*",
     "*://*.makemytrip.com/*",
-    "*://*.cleartrip.com/*",
-    "*://*.upgrad.com/*",
     "*://*.udemy.com/*"
   ],
   "background": {
@@ -25,8 +23,6 @@
         "*://*.amazon.in/*",
         "*://*.flipkart.com/*",
         "*://*.makemytrip.com/*",
-        "*://*.cleartrip.com/*",
-        "*://*.upgrad.com/*",
         "*://*.udemy.com/*"
       ],
       "js": ["src/extension/content.tsx"],
@@ -45,8 +41,6 @@
         "*://*.amazon.in/*",
         "*://*.flipkart.com/*",
         "*://*.makemytrip.com/*",
-        "*://*.cleartrip.com/*",
-        "*://*.upgrad.com/*",
         "*://*.udemy.com/*"
       ]
     }
