@@ -46,13 +46,15 @@ All core implementation plans, deep research reports, architecture specs, and wa
 ---
 
 ### 2. Deterministic Test Suite (`tests/engine.test.ts`)
-* **6/6 Automated Test Suites Passing (100% Precision):**
+* **8/8 Automated Test Suites Passing (100% Precision):**
   - Test 1: No-Cost EMI calculation (₹80,000 laptop over 12 months).
   - Test 2: Premature FD penalty vs. Liquid Fund (₹5,00,000 at month 6).
   - Test 3: Post-tax real yield verification.
   - Test 4: Section 50AA regulatory policy trigger.
   - Test 5: Anti-Advisory heuristic guardrails.
   - Test 6: Multi-Item Cart EMI risk evaluator and leakage thresholds.
+  - Test 7: Credit Utilization Ratio (CUR) / CIBIL Impact Simulator (Safe 18%, Caution 48%, Danger 75%).
+  - Test 8: Dual-Ledger Forfeited Card Reward Calculator (₹65k Sony TV full-swipe vs. EMI forfeiture).
 
 ---
 
@@ -60,10 +62,18 @@ All core implementation plans, deep research reports, architecture specs, and wa
 * **Platform Scope Lockdown:**
   - Restricted strictly to **Amazon.in**, **Flipkart.com**, **Udemy.com**, and **MakeMyTrip.com** in `manifest.json` and `content.tsx`.
   - Non-prototype platforms (Cleartrip, UpGrad, Scaler) safely removed.
+* **Interception Trigger Fine-Tuning (Popup Glitch Fix):**
+  - Excluded all selection inputs (`input[type="radio"]`, `input[type="checkbox"]`, and selection `<label>` elements) to ensure toggling payment methods never triggers premature popups.
+  - Intercepts strictly on final commitment/advancement buttons:
+    - `"Proceed to Buy"` / `"Proceed to Checkout"`
+    - `"Use this payment method"` / `"Use this Payment Method"`
+    - `"Place Order"` / `"Place your order"`
+    - `"Pay ₹..."` / `"Complete Payment"`
+    - `"Enroll now"` / `"Buy now"`
 * **Closed Shadow DOM Root:**
   - Injected via `attachShadow({ mode: 'closed' })` to guarantee 0% CSS leakage between host websites and Tailwind styling.
 * **CSP Security Compliance:**
-  - Dispatches simulated events to eliminate Content Security Policy (`script-src 'self'`) inline script execution violations.
+  - Dispatches simulated synthetic events to eliminate Content Security Policy (`script-src 'self'`) inline script execution violations.
 * **5-Layer Live Dynamic Price Scraping Architecture:**
   - **Layer 1 (Clicked Button / Action Element):** Directly scrapes price from clicked buttons (`Pay ₹31,763.00`, `Payment of ₹...`, `Buy now at ₹...`).
   - **Layer 2 (Authoritative Checkout Regexes):** Scrapes `Order Total: ₹26,190.00`, `Order Total ₹31,763.00`, and UPI QR amounts.
@@ -75,68 +85,44 @@ All core implementation plans, deep research reports, architecture specs, and wa
 * **Udemy Scraper Overhaul:**
   - Wiped legacy unkeyed cache (`commitguard_udemy_live_price`).
   - Added multi-course cart detection and dynamic title scraping from OpenGraph metadata and humanized URL slugs.
+* **Official Extension Icons Bundled:**
+  - Generated and bundled official Manifest V3 extension icons (`icon16.png`, `icon48.png`, `icon128.png`) in `src/extension/icons/` and `src/extension/build/icons/`.
 * **Floating Instant Intel Pill:**
   - Injects a non-intrusive floating trigger on supported checkout pages for on-demand math verification.
 
 ---
 
-### 4. Interactive Web Application & Modal Dashboard (`src/components/`, `src/app/`)
-* Modern Next.js 14 dashboard with discrete tenure snap points (3, 6, 9, 12, 18, 24 months).
-* Multi-item cart diagnostic warning banners.
-* Real-time payment method comparison cards (UPI vs. No-Cost EMI vs. Bank Offers).
+### 4. Interactive Embedded Modal Dashboard (`CommitGuardModal.tsx`)
+* **Dual-Ledger Card Switcher & Forfeited Rewards Calculator:**
+  - Category-aware card database (`src/lib/card-rewards.ts`) covering 10+ popular Indian credit cards (Amazon Pay ICICI, Flipkart Axis, HDFC Infinia/Millennia, SBI Cashback, Axis Atlas/Magnus, etc.).
+  - Computes exact cashback/reward points earned on full-swipe vs. 100% forfeiture on EMI conversion per bank MITC clauses.
+  - Displays real-time side-by-side delta between full-swipe rewards vs. net EMI friction.
+* **Pre-Checkout CIBIL / Credit Utilization Ratio (CUR) Danger Simulator:**
+  - Pre-transaction card limit inputs with rapid presets (`₹50k`, `₹1L`, `₹2L`, or custom numeric input) and current balance tracking.
+  - Visual color-coded gauge with safe (`< 30%`), caution (`30% - 50%`), and danger (`> 50%`) utilization tiering.
+  - Computes prospective single-card utilization spike and potential 20–40 point CIBIL score drop risk before placing the order.
+* **Interactive Tenure Snap Points:**
+  - Supports 3, 6, 9, 12, 18, and 24-month tenure simulations with real-time recalculation of GST drag, processing fees, and effective APR.
 
 ---
 
 ## ⏳ Part 2: Pending Implementations & Roadmap
 
-### 1. 🎯 Interception Trigger Fine-Tuning (Popup Glitch Fix on Payment Selection)
-* **Problem:** Currently, clicking payment method selection options (such as radio buttons `(•) EMI` or accordion headers) can trigger the modal prematurely while the user is still configuring their payment method.
-* **Required Fix:** 
-  - Strictly ignore `input[type="radio"]`, `input[type="checkbox"]`, and selection `<label>` elements.
-  - Trigger interception **only** on final commitment/advancement buttons:
-    - `"Proceed to Buy"`
-    - `"Use this payment method"`
-    - `"Pay ₹..."`
-    - `"Place Order"`
-    - `"Complete Payment"`
-    - `"Enroll now"` / `"Buy now"`
-
----
-
-### 2. 💳 Dual-Ledger Card Switcher & Forfeited Rewards Calculator
-* **Concept:** Instead of pFinTools' clunky 15-bank dropdown, CommitGuard uses an **Adaptive Quick Card Switcher** (`Amazon Pay ICICI (5%)`, `Flipkart Axis (5%)`, `HDFC Infinia/Regalia`, `SBI Cashback`, or Custom %).
-* **Features to Implement:**
-  - Computes the exact monetary value of cashback/reward points forfeited by choosing an EMI installment over upfront payment.
-  - Displays side-by-side comparison:
-    - **Upfront Full-Swipe Benefit:** `+₹1,500` (Direct Cashback / Points).
-    - **Net EMI Reality:** `-₹2,480` (18% GST Drag + Processing Fees + Forfeited Rewards).
-
----
-
-### 3. 📉 Pre-Checkout CIBIL / Credit Utilization Ratio (CUR) Danger Simulator
-* **Concept:** Existing tools (CRED, OneScore) only alert users **after** a credit score drops. CommitGuard warns the user **pre-transaction**.
-* **Features to Implement:**
-  - Quick credit limit input (`₹50k`, `₹1L`, `₹2L`, or custom numeric input).
-  - Computes prospective utilization:
-    $$\text{CUR} = \frac{\text{Order Principal} + \text{Existing Card Balance}}{\text{Credit Limit}} \times 100$$
-  - Visual color-coded gauge:
-    - 🟢 **Safe (`< 30%`):** Minimal score impact.
-    - 🟡 **Caution (`30% - 50%`):** Mild utilization drag.
-    - 🔴 **Danger (`> 50%`):** Warning of potential 20–40 point CIBIL score drop from high single-card utilization.
-
----
-
-### 4. 💼 Freelancer / SMB GST Input Tax Credit (ITC) Reclaimer
-* **Concept:** Many freelancers and sole proprietors make business electronics and software purchases under standard personal B2C invoices, losing 18% in tax write-offs.
+### 1. 💼 Freelancer / SMB GST Input Tax Credit (ITC) Reclaimer
+* **Concept:** Many freelancers and sole proprietors make business electronics, tech accessories, and software purchases under standard personal B2C invoices, losing 18% in tax write-offs.
 * **Features to Implement:**
   - For carts `> ₹5,000` on Amazon and Flipkart, display a non-intrusive banner:
     > *"Buying for business or freelance work? Claim back ₹X,XXX (18% GST Input Tax Credit) with your GSTIN before placing your order."*
 
 ---
 
-### 5. 📦 Production Packaging & Chrome Web Store Readiness
-* **Icons & Assets:** Generate official Manifest V3 extension icons (16x16, 48x48, 128x128).
-* **Settings & Preferences:** Allow users to save their primary credit cards (e.g. Amazon Pay ICICI, Flipkart Axis) in `chrome.storage.sync` so rewards math is pre-configured on every checkout.
+### 2. ⚙️ Card Profile Persistence (`chrome.storage.sync`)
+* **Concept:** Allow users to save their primary credit cards (e.g. Amazon Pay ICICI, Flipkart Axis) in `chrome.storage.sync` via the extension popup so their rewards profile is automatically pre-selected on checkout pages.
+
+---
+
+### 3. 🌐 End-to-End Live Extension Testing Across All 4 Domains
+* **Live Validation:** Verify dynamic live price scraping and commitment trigger reliability on active merchant checkout sessions for Amazon India, Flipkart, Udemy, and MakeMyTrip.
 
 ---
 
