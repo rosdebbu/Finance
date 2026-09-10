@@ -31,6 +31,17 @@ const config: Config = {
           rose: "#f43f5e",
           cyan: "#06b6d4",
         },
+        // CommitGuard interceptor modal — "bank passbook / ledger slip" palette.
+        // Ink-on-paper, not SaaS gradients: named after what each color represents on a
+        // real Indian bank ledger, not by hue.
+        ledger: {
+          navy: "#0B1D3A",   // ink / primary text
+          paper: "#F5F1E6",  // ledger paper background
+          debit: "#8B1E1E",  // debit / AVOID verdict ink
+          credit: "#1F6F4A", // credit / BEST verdict ink
+          seal: "#C9A227",   // brand seal / stamp accent, used sparingly
+          rule: "#D8D2C0",   // hairline divider
+        },
       },
       boxShadow: {
         glow: "0 0 25px -5px rgba(99, 102, 241, 0.25)",

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:extension": "esbuild src/extension/content.tsx --bundle --outfile=src/extension/build/content.js --loader:.tsx=tsx --define:process.env.NODE_ENV=\\\"production\\\" && esbuild src/extension/background.ts --bundle --outfile=src/extension/build/background.js --define:process.env.NODE_ENV=\\\"production\\\" && tailwindcss -i src/extension/styles.css -o src/extension/build/styles.css --minify",
+    "build:extension": "esbuild src/extension/content.tsx --bundle --outfile=src/extension/build/content.js --loader:.tsx=tsx --define:process.env.NODE_ENV=\\\"production\\\" && esbuild src/extension/background.ts --bundle --outfile=src/extension/build/background.js --define:process.env.NODE_ENV=\\\"production\\\" && tailwindcss -i src/extension/styles.css -o src/extension/build/styles.css --minify && node -e \"const fs=require('fs');const m=JSON.parse(fs.readFileSync('src/extension/manifest.json','utf8'));m.background.service_worker='background.js';m.content_scripts[0].js=['content.js'];m.web_accessible_resources[0].resources=['styles.css'];fs.writeFileSync('src/extension/build/manifest.json',JSON.stringify(m,null,2));fs.mkdirSync('src/extension/build/icons',{recursive:true});for(const f of fs.readdirSync('src/extension/icons')){fs.copyFileSync('src/extension/icons/'+f,'src/extension/build/icons/'+f);}\"",
     "start": "next start",
     "lint": "next lint",
     "test:engine": "tsx tests/engine.test.ts"

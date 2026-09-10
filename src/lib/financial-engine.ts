@@ -13,6 +13,10 @@ import {
   RealYieldResult,
   OpportunityCostResult,
   MultiCartEmiRiskResult,
+  CreditUtilizationInput,
+  CreditUtilizationResult,
+  ForfeitedRewardInput,
+  ForfeitedRewardResult,
 } from './types';
 
 const GST_RATE = 0.18; // 18% statutory GST
@@ -281,5 +285,67 @@ export function evaluateMultiCartEmiRisk(
     potentialInterestLeak,
     potentialGstLeak,
     totalRiskAmount,
+  };
+}
+
+/**
+ * 6. Pre-Checkout Credit Utilization Ratio (CUR) & CIBIL Impact Simulator
+ * Indian card networks block the FULL transaction principal against the credit limit the
+ * moment an EMI/card transaction is authorized — not just the monthly installment. CUR
+ * (blocked amount / total limit) carries roughly 30% weight in CIBIL/credit bureau scoring.
+ */
+export function calculateCreditUtilizationImpact(input: CreditUtilizationInput): CreditUtilizationResult {
+  const orderPrincipal = Math.max(0, input.orderPrincipal);
+  const existingCardBalance = Math.max(0, input.existingCardBalance);
+  const totalCreditLimit = Math.max(0, input.totalCreditLimit);
+
+  const blockedAmount = Number((orderPrincipal + existingCardBalance).toFixed(2));
+  const utilizationRatioPercent = totalCreditLimit > 0
+    ? Number(((blockedAmount / totalCreditLimit) * 100).toFixed(2))
+    : 0;
+
+  let riskTier: 'SAFE' | 'CAUTION' | 'DANGER';
+  let estimatedScoreDropRange: string;
+  if (utilizationRatioPercent < 30) {
+    riskTier = 'SAFE';
+    estimatedScoreDropRange = '0';
+  } else if (utilizationRatioPercent <= 50) {
+    riskTier = 'CAUTION';
+    estimatedScoreDropRange = '5-15';
+  } else {
+    riskTier = 'DANGER';
+    estimatedScoreDropRange = '20-40';
+  }
+
+  return {
+    orderPrincipal,
+    existingCardBalance,
+    totalCreditLimit,
+    blockedAmount,
+    utilizationRatioPercent,
+    riskTier,
+    estimatedScoreDropRange,
+  };
+}
+
+/**
+ * 7. Dual-Ledger Forfeited Card Reward Calculator
+ * Every major Indian bank explicitly excludes EMI transactions from earning reward points
+ * or cashback (verified per-bank MITC clauses in docs/RESEARCH_AND_FEATURE_PLAN.md) — so the
+ * reward the card would have earned on a full-swipe payment is 100% forfeited on EMI.
+ */
+export function calculateForfeitedCardReward(input: ForfeitedRewardInput): ForfeitedRewardResult {
+  const orderPrincipal = Math.max(0, input.orderPrincipal);
+  const rewardRatePercent = Math.max(0, input.rewardRatePercent);
+
+  const rewardIfFullSwipe = Number((orderPrincipal * (rewardRatePercent / 100)).toFixed(2));
+  const netCostIfFullSwipe = Number((orderPrincipal - rewardIfFullSwipe).toFixed(2));
+
+  return {
+    orderPrincipal,
+    rewardRatePercent,
+    rewardIfFullSwipe,
+    netCostIfFullSwipe,
+    forfeitedIfEmi: rewardIfFullSwipe,
   };
 }

@@ -48,6 +48,7 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
     reason: string;
     netPrice: number;
     recommended: boolean;
+    isSelected?: boolean;
   }
 
   // Helper to parse currency strings properly handling decimals (e.g. ₹539.00 -> 539, NOT 53900)
@@ -65,6 +66,26 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
     const cleanDigits = text.replace(/[^0-9.]/g, '');
     const fallbackVal = parseFloat(cleanDigits);
     return isNaN(fallbackVal) ? 0 : Math.round(fallbackVal);
+  }
+
+  // Shared Freelancer/Business GST Input Tax Credit (ITC) advisory — Section 16 of the CGST
+  // Act lets a registered GSTIN business/freelancer reclaim GST paid on purchases used in the
+  // course of business. Shown for any commitment above the ₹5,000 threshold on ANY surface —
+  // once a platform issues a B2C invoice at payment completion, it cannot be converted to a
+  // B2B tax invoice afterward, so this only helps if raised BEFORE the user pays.
+  function buildGstItcOffer(id: string, price: number, gstRatePercent: number, invoiceLabel: string): ScrapedOffer | null {
+    if (price < 5000) return null;
+    const itcAmount = Math.round(price * (gstRatePercent / 100));
+    return {
+      id,
+      bankOrCard: `Freelancer/Business Tip: ${invoiceLabel}`,
+      description: `Claim ${gstRatePercent}% GST Input Tax Credit (ITC) if this is a business purchase`,
+      effectiveBenefit: `Reclaim up to ₹${itcAmount.toLocaleString('en-IN')} via ITC`,
+      rating: 'GOOD',
+      reason: `Registered GSTIN businesses/freelancers can offset ₹${itcAmount.toLocaleString('en-IN')} of output tax liability under Section 16 of the CGST Act — but only if a GST invoice is requested BEFORE payment completes; a B2C invoice cannot be converted afterward.`,
+      netPrice: price - itcAmount,
+      recommended: false,
+    };
   }
 
   // Universal Live Scraper adapting dynamically to Amazon, Flipkart, MakeMyTrip, Cleartrip, UpGrad, and Udemy
@@ -329,11 +350,28 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
       }
 
       // Strategy 4: Checked radio buttons or active list elements in payment view
-      if (!detectedBankName && !isExplicitUpi && !isExplicitTnpl) {
+      if (!detectedBankName && !isExplicitUpi && !isExplicitTnpl && !isExplicitNoCost) {
         const activeEls = document.querySelectorAll('input[type="radio"]:checked, [aria-checked="true"], [class*="selected"], [class*="active"]');
         for (const el of Array.from(activeEls)) {
           const parentRow = el.closest('li, label, tr, div') || el;
-          const cleaned = cleanBankText(parentRow.textContent || '');
+          const rawActiveText = (parentRow.textContent || '').trim();
+
+          // Classify the active element itself BEFORE treating leftover text as a bank name —
+          // otherwise an active "UPI" / "Scan to Pay" tab gets misread as a bank name.
+          if (/scan\s*to\s*pay|qr|upi|google\s*pay|phonepe|paytm/i.test(rawActiveText) && rawActiveText.length < 100) {
+            isExplicitUpi = true;
+            break;
+          }
+          if (/tnpl|travel\s*now\s*pay\s*later|trip\s*money/i.test(rawActiveText) && rawActiveText.length < 100) {
+            isExplicitTnpl = true;
+            break;
+          }
+          if (/no\s*cost\s*emi/i.test(rawActiveText) && rawActiveText.length < 100 && !/bank|card/i.test(rawActiveText)) {
+            isExplicitNoCost = true;
+            break;
+          }
+
+          const cleaned = cleanBankText(rawActiveText);
           if (cleaned && cleaned.length >= 2 && cleaned.length <= 45 && !isGenericNoise(cleaned)) {
             detectedBankName = cleaned;
             break;
@@ -419,7 +457,9 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
       const bankProcessingFeeTotal = Math.round(199 * 1.18); // ₹235
       const realTrueOutflow = statedTotalPayable + gstOnInterest + bankProcessingFeeTotal;
 
-      const isBankSelected = !isExplicitUpi && !isExplicitTnpl && !isExplicitNoCost;
+      // Only claim the generic "Bank/Card" option is selected when we actually detected a real
+      // bank name — never by elimination alone, or a page with no clear signal defaults to it.
+      const isBankSelected = !isExplicitUpi && !isExplicitTnpl && !isExplicitNoCost && !!detectedBankName;
 
       const travelOffers: ScrapedOffer[] = [
         {
@@ -478,6 +518,16 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
           isSelected: isExplicitTnpl,
         },
       ];
+
+      // Freelancer/Business GST Input Tax Credit reminder — GST rate varies by travel category:
+      // ~5% economy flights, ~12% business flights, 12-18% hotel stays (Section 16 CGST Act).
+      const travelGstRate = /hotel|stay|check-in|check-out/i.test(bodyText)
+        ? 15
+        : /business\s*class/i.test(bodyText)
+        ? 12
+        : 5;
+      const travelGstItcOffer = buildGstItcOffer('travel-gst-itc', travelPrice, travelGstRate, 'Business Travel GST Invoice');
+      if (travelGstItcOffer) travelOffers.push(travelGstItcOffer);
 
       return {
         surfaceType: 'TRAVEL',
@@ -704,8 +754,13 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
       if (!detectedPrice) {
         // No bare "first ₹ figure on page" fallback here on purpose — Udemy pages are full of
         // recommended-course and "students also bought" prices that aren't the item being bought.
+        // \b is required before "Total" — without it, "Subtotal" (which contains "Total" as a
+        // substring) matches first and wins, undercounting the price by the GST amount.
+        // The optional "(?:\s*\([^)]*\))?" + "[^₹$€£]{0,24}" gap tolerates GST-inclusive labels
+        // like "Total (2 courses):\n₹1,342.84" where the label and amount sit on separate lines
+        // with a digit (course count) in between.
         const udemyRegexPatterns = [
-          /(?:Total|Order\s*Total|Total\s*Amount)[^\d₹$€£]*[₹$€£]\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
+          /\b(?:Order\s*Total|Total\s*Amount|Total)\b(?:\s*\([^)]*\))?[^₹$€£]{0,24}[₹$€£]\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
           /(?:Current\s*price)[^\d₹$€£]*[₹$€£]\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
         ];
         for (const pat of udemyRegexPatterns) {
@@ -749,16 +804,50 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
       const udemyOrigPrice = detectedOriginalPrice > 0 ? detectedOriginalPrice : 0;
       const discountPct = detectedDiscount > 0 ? detectedDiscount : (udemyOrigPrice > udemyPrice && udemyOrigPrice > 0 ? Math.round(((udemyOrigPrice - udemyPrice) / udemyOrigPrice) * 100) : 0);
 
+      // -----------------------------------------------------------------------
+      // LIVE PAYMENT CHANNEL DETECTOR (UPI / Cards / Net Banking / Mobile Wallet)
+      // Reflects whichever channel is actually checked on Udemy's real checkout
+      // radio group, instead of always hardcoding the label to "UPI / Debit Card".
+      // -----------------------------------------------------------------------
+      function classifyUdemyPaymentText(t: string): string {
+        const s = (t || '').toLowerCase();
+        if (!s) return '';
+        if (/\bupi\b/.test(s)) return 'UPI';
+        if (/net\s*banking/.test(s)) return 'Net Banking';
+        if (/mobile\s*wallet|\bwallet\b/.test(s)) return 'Mobile Wallet';
+        if (/\bcard\b/.test(s)) return 'Cards';
+        return '';
+      }
+
+      let detectedUdemyChannel = '';
+      if (clickedEl) {
+        const row = clickedEl.closest('li, label, div, [role="radio"]') || clickedEl;
+        detectedUdemyChannel = classifyUdemyPaymentText((row.textContent || '').trim());
+      }
+      if (!detectedUdemyChannel) {
+        const checkedPaymentEls = document.querySelectorAll('input[type="radio"]:checked, [aria-checked="true"]');
+        for (const el of Array.from(checkedPaymentEls)) {
+          const row = el.closest('li, label, div') || el;
+          const cat = classifyUdemyPaymentText((row.textContent || '').trim());
+          if (cat) {
+            detectedUdemyChannel = cat;
+            break;
+          }
+        }
+      }
+      const udemyChannelLabel = detectedUdemyChannel || 'UPI / Debit Card';
+
       const udemyOffers: ScrapedOffer[] = [
         {
           id: 'upi-udemy',
-          bankOrCard: 'UPI / Debit Card (Immediate Full Pay)',
+          bankOrCard: `${udemyChannelLabel} (Immediate Full Pay)`,
           description: 'Single payment without BNPL or EMI installment debt',
           effectiveBenefit: 'Zero interest, zero processing friction',
           rating: 'BEST',
           reason: 'Never finance small educational purchases under ₹2,000 with consumer credit.',
           netPrice: udemyPrice,
           recommended: true,
+          isSelected: !!detectedUdemyChannel,
         },
         {
           id: 't-bill-delay',
@@ -781,6 +870,10 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
           recommended: false,
         },
       ];
+
+      // Freelancer/Business GST Input Tax Credit reminder (bootcamps/courses > ₹5,000)
+      const udemyGstItcOffer = buildGstItcOffer('udemy-gst-itc', udemyPrice, 18, 'Udemy Business GST Invoice');
+      if (udemyGstItcOffer) udemyOffers.push(udemyGstItcOffer);
 
       return {
         surfaceType: 'UDEMY',
@@ -1020,6 +1113,45 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
 
       // ZERO HARDCODED FALLBACK: Authoritative detected price
       const amazonFinalPrice = detectedPrice;
+
+      // -----------------------------------------------------------------------
+      // LIVE PAYMENT METHOD SELECTION DETECTOR
+      // Reads which payment option the user has ACTUALLY selected/checked on the
+      // real Amazon page, instead of always defaulting the modal's "YOUR SELECTED
+      // PAYMENT OPTION" card to UPI (offers[0]) regardless of live page state.
+      // -----------------------------------------------------------------------
+      type AmazonPaymentCategory = 'UPI' | 'EMI' | 'ICICI_CARD' | 'CARD' | '';
+      function classifyAmazonPaymentText(text: string): AmazonPaymentCategory {
+        const t = (text || '').toLowerCase();
+        if (!t) return '';
+        if (/\bemi\b/.test(t)) return 'EMI';
+        if (/\bupi\b|amazon\s*pay\s*balance/.test(t)) return 'UPI';
+        if (/icici/.test(t)) return 'ICICI_CARD';
+        if (/credit\s*or\s*debit\s*card|\bcard\b/.test(t)) return 'CARD';
+        return '';
+      }
+
+      let detectedPaymentCategory: AmazonPaymentCategory = '';
+
+      // Strategy 1: the row the user actually clicked, if it's a payment method option
+      if (clickedEl) {
+        const rowEl = clickedEl.closest('li, label, tr, [role="radio"], [class*="payment"], [class*="pmts"]') || clickedEl;
+        detectedPaymentCategory = classifyAmazonPaymentText(rowEl.textContent || '');
+      }
+
+      // Strategy 2: whichever radio/option is actually checked on the page right now
+      if (!detectedPaymentCategory) {
+        const checkedEls = document.querySelectorAll('input[type="radio"]:checked, [aria-checked="true"]');
+        for (const el of Array.from(checkedEls)) {
+          const rowEl = el.closest('li, label, tr, div') || el;
+          const cat = classifyAmazonPaymentText(rowEl.textContent || '');
+          if (cat) {
+            detectedPaymentCategory = cat;
+            break;
+          }
+        }
+      }
+
       const amazonOffers: ScrapedOffer[] = [];
 
       // 1. Direct UPI / Amazon Pay Balance (Zero Debt)
@@ -1032,6 +1164,7 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         reason: 'Zero interest, zero processing fee, keeps credit limit 100% free.',
         netPrice: amazonFinalPrice,
         recommended: true,
+        isSelected: detectedPaymentCategory === 'UPI',
       });
 
       // 2. Amazon Pay ICICI Bank Credit Card (5% Cashback)
@@ -1051,6 +1184,7 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         reason: `Earns ₹${iciciCashback.toLocaleString('en-IN')} unconditional Amazon Pay balance without any tenure lock-in.`,
         netPrice: amazonFinalPrice - iciciCashback,
         recommended: true,
+        isSelected: detectedPaymentCategory === 'ICICI_CARD',
       });
 
       // 3. Amazon Bank Offers (e.g. HDFC / SBI / ICICI Instant Credit Card Discounts)
@@ -1070,6 +1204,7 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         reason: 'Direct instant price reduction at checkout if paid in full single tranche.',
         netPrice: amazonFinalPrice - bankDiscount,
         recommended: false,
+        isSelected: detectedPaymentCategory === 'CARD',
       });
 
       // 4. Amazon No-Cost EMI (With Hidden GST + Fee Alert)
@@ -1088,22 +1223,12 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         reason: `Hidden administrative leak: charges ₹199 bank fee + ₹${estimatedGstFee} non-refundable GST on monthly interest.`,
         netPrice: amazonFinalPrice + estimatedGstFee,
         recommended: false,
+        isSelected: detectedPaymentCategory === 'EMI',
       });
 
-      // 5. Amazon Business GST Invoice (If detected on page)
-      if (/GST\s*invoice|business\s*purchase/i.test(bodyText)) {
-        const gstInputCredit = Math.round(amazonFinalPrice * 0.18);
-        amazonOffers.push({
-          id: 'amazon-gst-itc',
-          bankOrCard: 'Partner Offer: Amazon Business GST Invoice',
-          description: 'Claim Input Tax Credit (ITC) for business purchases',
-          effectiveBenefit: `Save up to ₹${gstInputCredit.toLocaleString('en-IN')} (18% GST ITC)`,
-          rating: 'GOOD',
-          reason: 'Valid for registered GSTIN businesses to offset output tax liability.',
-          netPrice: amazonFinalPrice - gstInputCredit,
-          recommended: false,
-        });
-      }
+      // 5. Freelancer/Business GST Input Tax Credit reminder (carts > ₹5,000)
+      const amazonGstItcOffer = buildGstItcOffer('amazon-gst-itc', amazonFinalPrice, 18, 'Amazon Business GST Invoice');
+      if (amazonGstItcOffer) amazonOffers.push(amazonGstItcOffer);
 
       return {
         surfaceType: 'AMAZON',
@@ -1244,17 +1369,38 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
 
     const flipkartPrice = detectedPrice;
 
-    // Check which specific payment card or EMI option user clicked
+    // Check which specific payment card or EMI option the user has actually selected
+    function classifyFlipkartPaymentText(t: string): string {
+      if (/icici/i.test(t)) return 'ICICI Bank Credit Card (No Cost EMI)';
+      if (/bajaj/i.test(t)) return 'Bajaj Finance (No Cost EMI)';
+      if (/bobcard|bob/i.test(t)) return 'BOBCARD Credit Card';
+      if (/kotak/i.test(t)) return 'Kotak Mahindra Bank Credit Card';
+      if (/axis/i.test(t)) return 'Flipkart Axis Bank Credit Card';
+      if (/upi|qr\s*code|google\s*pay|phonepe/i.test(t)) return 'UPI';
+      return '';
+    }
+
     let clickedFlipkartCard = '';
     if (clickedEl) {
       const row = clickedEl.closest('li, label, div, button, tr') || clickedEl;
-      const t = (row.textContent || '').trim();
-      if (/icici/i.test(t)) clickedFlipkartCard = 'ICICI Bank Credit Card (No Cost EMI)';
-      else if (/bajaj/i.test(t)) clickedFlipkartCard = 'Bajaj Finance (No Cost EMI)';
-      else if (/bobcard|bob/i.test(t)) clickedFlipkartCard = 'BOBCARD Credit Card';
-      else if (/kotak/i.test(t)) clickedFlipkartCard = 'Kotak Mahindra Bank Credit Card';
-      else if (/axis/i.test(t)) clickedFlipkartCard = 'Flipkart Axis Bank Credit Card';
-      else if (/upi|qr|google\s*pay|phonepe/i.test(t)) clickedFlipkartCard = 'UPI';
+      clickedFlipkartCard = classifyFlipkartPaymentText((row.textContent || '').trim());
+    }
+
+    // Fallback: the click didn't tell us (e.g. user clicked "Place Order", or the trigger fired
+    // via the floating pill with no click at all) — scan for whichever option is actually
+    // checked/active on the page right now instead of leaving this blank.
+    if (!clickedFlipkartCard) {
+      const activePaymentEls = document.querySelectorAll(
+        'input[type="radio"]:checked, [aria-checked="true"], [class*="tab"][class*="active"], [class*="tab"][class*="selected"]'
+      );
+      for (const el of Array.from(activePaymentEls)) {
+        const row = el.closest('li, label, div, tr') || el;
+        const cat = classifyFlipkartPaymentText((row.textContent || '').trim());
+        if (cat) {
+          clickedFlipkartCard = cat;
+          break;
+        }
+      }
     }
 
     const flipkartOffers: ScrapedOffer[] = [];
@@ -1272,7 +1418,7 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
       reason: 'Zero interest, zero processing fee, keeps credit limit 100% free.',
       netPrice: flipkartPrice,
       recommended: true,
-      isSelected: clickedFlipkartCard === 'UPI' || (!clickedFlipkartCard && true),
+      isSelected: clickedFlipkartCard === 'UPI',
     });
 
     // 2. Flipkart Axis Bank Credit Card (5% Cashback)
@@ -1377,6 +1523,10 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
       });
     }
 
+    // Freelancer/Business GST Input Tax Credit reminder (carts > ₹5,000)
+    const flipkartGstItcOffer = buildGstItcOffer('flipkart-gst-itc', flipkartPrice, 18, 'Flipkart Business GST Invoice');
+    if (flipkartGstItcOffer) flipkartOffers.push(flipkartGstItcOffer);
+
     return {
       surfaceType: 'FLIPKART',
       price: flipkartPrice,
@@ -1447,8 +1597,8 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         padding: 1rem; background-color: rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       }
       .commitguard-card {
-        position: relative; width: 100%; max-width: 48rem; background-color: #ffffff; border-radius: 1rem;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); border: 1px solid #e2e8f0; overflow: hidden;
+        position: relative; width: 100%; max-width: 58rem; background-color: #F5F1E6; border-radius: 0.375rem;
+        box-shadow: 0 25px 50px -12px rgba(11, 29, 58, 0.45); border: 1px solid #0B1D3A; overflow: hidden;
       }
     `;
     shadowRoot.appendChild(inlineStyle);
@@ -1520,9 +1670,11 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
     }
   }
 
-  // Multi-Surface Universal Keywords and Fuzzy Intent Matchers
-  // Seamlessly handles wording variations across Flipkart, Amazon, MakeMyTrip, Cleartrip, UpGrad
-  const UNIVERSAL_INTERCEPT_KEYWORDS = [
+  // Final-Commitment Keywords ONLY — intermediate selection labels (bank names, "select
+  // tenure", "months x", "total payable", "no cost emi" badges, etc.) are deliberately
+  // excluded. Matching those caused the modal to fire the instant a payment-method radio
+  // was picked, before the user had actually committed to anything.
+  const FINAL_COMMIT_KEYWORDS = [
     // 1. E-Commerce (Flipkart, Amazon)
     'continue with emi',
     'buy with emi',
@@ -1532,7 +1684,6 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
     'place your order',
     'proceed to pay',
     'proceed to retail checkout',
-    'credit card emi',
     'complete payment',
     'buy now',
 
@@ -1543,36 +1694,24 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
     'book now pay later',
     'book now, pay later',
     'pay with trip money',
-    'pay in emi',
-    'easy emi',
     'continue to payment',
-    'book flight',
     'pay & book now',
-    'select your bank',
-    'select tenure',
-    'months x',
-    'total payable',
-    'scan to pay',
-    'cardless emi',
-    'no cost emi',
+    'use this payment method',
 
     // 3. Ed-Tech & Udemy (UpGrad, Scaler, Simplilearn, Udemy)
     'education loan',
     'apply for education loan',
     'pay with loan',
-    'pay in installments',
-    '0% interest emi',
-    'no cost emi options',
-    'enroll with emi',
     'apply for loan',
-    'finance options',
     'complete checkout',
     'enroll now',
     'buy this course',
     'go to cart',
   ];
 
-  // Helper to check if an element or its ancestors match target intent across ANY non-financial surface
+  // Helper to check if an element or its ancestors is a genuine final-commitment action.
+  // Selection controls (radio/checkbox/label) are strictly ignored — they can never trigger
+  // the interceptor themselves, only genuine "Pay"/"Place Order"/"Proceed" actions can.
   function findInterceptTarget(element: HTMLElement | null): HTMLElement | null {
     let curr = element;
     let depth = 0;
@@ -1582,9 +1721,22 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
         return null;
       }
 
+      const tagName = curr.tagName.toUpperCase();
+
+      // Strictly ignore payment-method / bank / tenure SELECTION controls. Picking an option
+      // must never itself open the modal — only clicking a real commit action further down
+      // the flow should. Skip evaluating this node as a trigger and keep climbing ancestors.
+      const isSelectionControl =
+        tagName === 'LABEL' ||
+        (tagName === 'INPUT' && /^(radio|checkbox)$/.test(((curr as HTMLInputElement).type || '').toLowerCase()));
+      if (isSelectionControl) {
+        curr = curr.parentElement;
+        depth++;
+        continue;
+      }
+
       // Check text content of button, link, or clickable element
       const text = (curr.innerText || curr.textContent || '').trim().toLowerCase();
-      const tagName = curr.tagName.toUpperCase();
 
       // 1. Explicitly IGNORE purely informational accordions, learn-more links, tooltips, and informational dropdowns
       if (
@@ -1598,55 +1750,48 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
       }
 
       // Direct & Fuzzy Keyword Match
-      for (const keyword of UNIVERSAL_INTERCEPT_KEYWORDS) {
+      for (const keyword of FINAL_COMMIT_KEYWORDS) {
         if (text === keyword || (text.length < 70 && text.includes(keyword))) {
           return curr;
         }
       }
 
-      // Dynamic Regex Matcher: Catches custom bank names, tenures, and EMI options on actual action elements
+      // Dynamic Regex Matcher: catches final-action buttons whose exact wording we can't
+      // predict (e.g. "Pay ₹31,763 via ICICI Bank"). Restricted to BUTTON/A/role=button —
+      // never LABEL, LI, role="radio", or role="tab", since those are selection rows.
       if (
-        /(\bemi\b|\bloan\b|\btnpl\b|pay\s*later|installment|subvention|place\s*order|proceed\s*to\s*pay|months\s*x|total\s*payable|no\s*cost\s*emi|kotak|bajaj|hdfc|icici|axis|idfc|scan\s*to\s*pay)/i.test(text) &&
-        (tagName === 'BUTTON' || tagName === 'A' || tagName === 'LABEL' || tagName === 'LI' || curr.getAttribute('role') === 'button' || curr.getAttribute('role') === 'radio' || curr.getAttribute('role') === 'tab' || curr.classList.toString().includes('btn') || curr.classList.toString().includes('option') || curr.classList.toString().includes('item') || curr.classList.toString().includes('bank') || curr.classList.toString().includes('tenure'))
+        /(place\s*order|proceed\s*to\s*pay|proceed\s*to\s*buy|pay\s*₹|payment\s*of\s*₹|complete\s*payment|complete\s*checkout)/i.test(text) &&
+        (tagName === 'BUTTON' || tagName === 'A' || curr.getAttribute('role') === 'button' || curr.classList.toString().includes('btn'))
       ) {
-        // Skip if this is merely a collapsible header or informational link
-        if (/available|learn\s*more|faq|policy/i.test(text)) {
-          return null;
-        }
         return curr;
       }
 
-      // Check input elements (e.g., input[type="radio"], input[type="submit"])
+      // Check input elements — ONLY submit/button (a genuine "Pay"/"Place Order" control),
+      // never radio/checkbox (handled by isSelectionControl above).
       if (tagName === 'INPUT') {
         const inputType = ((curr as HTMLInputElement).type || '').toLowerCase();
         const inputVal = ((curr as HTMLInputElement).value || '').toLowerCase();
-        const inputName = ((curr as HTMLInputElement).name || '').toLowerCase();
-        
-        if (inputType === 'radio' || inputType === 'submit' || inputType === 'button') {
-          for (const keyword of UNIVERSAL_INTERCEPT_KEYWORDS) {
-            if (inputVal.includes(keyword) || inputName.includes(keyword) || text.includes(keyword)) {
+
+        if (inputType === 'submit' || inputType === 'button') {
+          for (const keyword of FINAL_COMMIT_KEYWORDS) {
+            if (inputVal.includes(keyword) || text.includes(keyword)) {
               return curr;
             }
           }
-          if (/emi|bank|tenure|pay/i.test(inputName) || /emi|bank|tenure|pay/i.test(inputVal)) {
+          if (/pay|place\s*order|proceed/i.test(inputVal)) {
             return curr;
           }
         }
       }
 
-      // Check button classes or IDs
+      // Check button classes or IDs — final-action identifiers only
       const idStr = (curr.id || '').toLowerCase();
       const classStr = (curr.className || '').toString().toLowerCase();
       if (
         idStr.includes('placeorder') ||
         idStr.includes('proceedtopay') ||
         idStr.includes('emipayment') ||
-        idStr.includes('selectbank') ||
-        idStr.includes('selecttenure') ||
-        classStr.includes('paylater') ||
-        classStr.includes('emiselection') ||
-        classStr.includes('bankitem') ||
-        classStr.includes('tenureitem')
+        classStr.includes('paylater')
       ) {
         return curr;
       }

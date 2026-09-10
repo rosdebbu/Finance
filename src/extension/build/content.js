@@ -7327,50 +7327,23 @@
   ];
   var ArrowRight = createLucideIcon("ArrowRight", __iconNode);
 
-  // node_modules/lucide-react/dist/esm/icons/book-open.js
-  var __iconNode2 = [
-    ["path", { d: "M12 7v14", key: "1akyts" }],
-    [
-      "path",
-      {
-        d: "M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z",
-        key: "ruj8y"
-      }
-    ]
-  ];
-  var BookOpen = createLucideIcon("BookOpen", __iconNode2);
-
   // node_modules/lucide-react/dist/esm/icons/chevron-down.js
-  var __iconNode3 = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
-  var ChevronDown = createLucideIcon("ChevronDown", __iconNode3);
+  var __iconNode2 = [["path", { d: "m6 9 6 6 6-6", key: "qrunsl" }]];
+  var ChevronDown = createLucideIcon("ChevronDown", __iconNode2);
 
   // node_modules/lucide-react/dist/esm/icons/chevron-up.js
-  var __iconNode4 = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
-  var ChevronUp = createLucideIcon("ChevronUp", __iconNode4);
+  var __iconNode3 = [["path", { d: "m18 15-6-6-6 6", key: "153udz" }]];
+  var ChevronUp = createLucideIcon("ChevronUp", __iconNode3);
 
   // node_modules/lucide-react/dist/esm/icons/credit-card.js
-  var __iconNode5 = [
+  var __iconNode4 = [
     ["rect", { width: "20", height: "14", x: "2", y: "5", rx: "2", key: "ynyp8z" }],
     ["line", { x1: "2", x2: "22", y1: "10", y2: "10", key: "1b3vmo" }]
   ];
-  var CreditCard = createLucideIcon("CreditCard", __iconNode5);
-
-  // node_modules/lucide-react/dist/esm/icons/graduation-cap.js
-  var __iconNode6 = [
-    [
-      "path",
-      {
-        d: "M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z",
-        key: "j76jl0"
-      }
-    ],
-    ["path", { d: "M22 10v6", key: "1lu8f3" }],
-    ["path", { d: "M6 12.5V16a6 3 0 0 0 12 0v-3.5", key: "1r8lef" }]
-  ];
-  var GraduationCap = createLucideIcon("GraduationCap", __iconNode6);
+  var CreditCard = createLucideIcon("CreditCard", __iconNode4);
 
   // node_modules/lucide-react/dist/esm/icons/piggy-bank.js
-  var __iconNode7 = [
+  var __iconNode5 = [
     [
       "path",
       {
@@ -7381,29 +7354,24 @@
     ["path", { d: "M2 9v1c0 1.1.9 2 2 2h1", key: "nm575m" }],
     ["path", { d: "M16 11h.01", key: "xkw8gn" }]
   ];
-  var PiggyBank = createLucideIcon("PiggyBank", __iconNode7);
-
-  // node_modules/lucide-react/dist/esm/icons/plane.js
-  var __iconNode8 = [
-    [
-      "path",
-      {
-        d: "M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z",
-        key: "1v9wt8"
-      }
-    ]
-  ];
-  var Plane = createLucideIcon("Plane", __iconNode8);
+  var PiggyBank = createLucideIcon("PiggyBank", __iconNode5);
 
   // node_modules/lucide-react/dist/esm/icons/rotate-ccw.js
-  var __iconNode9 = [
+  var __iconNode6 = [
     ["path", { d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8", key: "1357e3" }],
     ["path", { d: "M3 3v5h5", key: "1xhq8a" }]
   ];
-  var RotateCcw = createLucideIcon("RotateCcw", __iconNode9);
+  var RotateCcw = createLucideIcon("RotateCcw", __iconNode6);
+
+  // node_modules/lucide-react/dist/esm/icons/search.js
+  var __iconNode7 = [
+    ["circle", { cx: "11", cy: "11", r: "8", key: "4ej97u" }],
+    ["path", { d: "m21 21-4.3-4.3", key: "1qie3q" }]
+  ];
+  var Search = createLucideIcon("Search", __iconNode7);
 
   // node_modules/lucide-react/dist/esm/icons/shield-check.js
-  var __iconNode10 = [
+  var __iconNode8 = [
     [
       "path",
       {
@@ -7413,18 +7381,10 @@
     ],
     ["path", { d: "m9 12 2 2 4-4", key: "dzmm74" }]
   ];
-  var ShieldCheck = createLucideIcon("ShieldCheck", __iconNode10);
-
-  // node_modules/lucide-react/dist/esm/icons/shopping-bag.js
-  var __iconNode11 = [
-    ["path", { d: "M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z", key: "hou9p0" }],
-    ["path", { d: "M3 6h18", key: "d0wm0j" }],
-    ["path", { d: "M16 10a4 4 0 0 1-8 0", key: "1ltviw" }]
-  ];
-  var ShoppingBag = createLucideIcon("ShoppingBag", __iconNode11);
+  var ShieldCheck = createLucideIcon("ShieldCheck", __iconNode8);
 
   // node_modules/lucide-react/dist/esm/icons/sliders-vertical.js
-  var __iconNode12 = [
+  var __iconNode9 = [
     ["line", { x1: "4", x2: "4", y1: "21", y2: "14", key: "1p332r" }],
     ["line", { x1: "4", x2: "4", y1: "10", y2: "3", key: "gb41h5" }],
     ["line", { x1: "12", x2: "12", y1: "21", y2: "12", key: "hf2csr" }],
@@ -7435,59 +7395,17 @@
     ["line", { x1: "10", x2: "14", y1: "8", y2: "8", key: "1yglbp" }],
     ["line", { x1: "18", x2: "22", y1: "16", y2: "16", key: "1jxqpz" }]
   ];
-  var SlidersVertical = createLucideIcon("SlidersVertical", __iconNode12);
-
-  // node_modules/lucide-react/dist/esm/icons/sparkles.js
-  var __iconNode13 = [
-    [
-      "path",
-      {
-        d: "M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z",
-        key: "4pj2yx"
-      }
-    ],
-    ["path", { d: "M20 3v4", key: "1olli1" }],
-    ["path", { d: "M22 5h-4", key: "1gvqau" }],
-    ["path", { d: "M4 17v2", key: "vumght" }],
-    ["path", { d: "M5 18H3", key: "zchphs" }]
-  ];
-  var Sparkles = createLucideIcon("Sparkles", __iconNode13);
-
-  // node_modules/lucide-react/dist/esm/icons/thumbs-down.js
-  var __iconNode14 = [
-    ["path", { d: "M17 14V2", key: "8ymqnk" }],
-    [
-      "path",
-      {
-        d: "M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z",
-        key: "m61m77"
-      }
-    ]
-  ];
-  var ThumbsDown = createLucideIcon("ThumbsDown", __iconNode14);
-
-  // node_modules/lucide-react/dist/esm/icons/thumbs-up.js
-  var __iconNode15 = [
-    ["path", { d: "M7 10v12", key: "1qc93n" }],
-    [
-      "path",
-      {
-        d: "M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z",
-        key: "emmmcr"
-      }
-    ]
-  ];
-  var ThumbsUp = createLucideIcon("ThumbsUp", __iconNode15);
+  var SlidersVertical = createLucideIcon("SlidersVertical", __iconNode9);
 
   // node_modules/lucide-react/dist/esm/icons/trending-up.js
-  var __iconNode16 = [
+  var __iconNode10 = [
     ["polyline", { points: "22 7 13.5 15.5 8.5 10.5 2 17", key: "126l90" }],
     ["polyline", { points: "16 7 22 7 22 13", key: "kwv8wd" }]
   ];
-  var TrendingUp = createLucideIcon("TrendingUp", __iconNode16);
+  var TrendingUp = createLucideIcon("TrendingUp", __iconNode10);
 
   // node_modules/lucide-react/dist/esm/icons/triangle-alert.js
-  var __iconNode17 = [
+  var __iconNode11 = [
     [
       "path",
       {
@@ -7498,26 +7416,27 @@
     ["path", { d: "M12 9v4", key: "juzpu7" }],
     ["path", { d: "M12 17h.01", key: "p32p05" }]
   ];
-  var TriangleAlert = createLucideIcon("TriangleAlert", __iconNode17);
+  var TriangleAlert = createLucideIcon("TriangleAlert", __iconNode11);
 
-  // node_modules/lucide-react/dist/esm/icons/x.js
-  var __iconNode18 = [
-    ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
-    ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
-  ];
-  var X = createLucideIcon("X", __iconNode18);
-
-  // node_modules/lucide-react/dist/esm/icons/zap.js
-  var __iconNode19 = [
+  // node_modules/lucide-react/dist/esm/icons/wallet.js
+  var __iconNode12 = [
     [
       "path",
       {
-        d: "M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z",
-        key: "1xq2db"
+        d: "M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1",
+        key: "18etb6"
       }
-    ]
+    ],
+    ["path", { d: "M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4", key: "xoc0q4" }]
   ];
-  var Zap = createLucideIcon("Zap", __iconNode19);
+  var Wallet = createLucideIcon("Wallet", __iconNode12);
+
+  // node_modules/lucide-react/dist/esm/icons/x.js
+  var __iconNode13 = [
+    ["path", { d: "M18 6 6 18", key: "1bl5f8" }],
+    ["path", { d: "m6 6 12 12", key: "d8bk6v" }]
+  ];
+  var X = createLucideIcon("X", __iconNode13);
 
   // src/lib/financial-engine.ts
   var GST_RATE = 0.18;
@@ -7628,8 +7547,171 @@
       totalRiskAmount
     };
   }
+  function calculateCreditUtilizationImpact(input) {
+    const orderPrincipal = Math.max(0, input.orderPrincipal);
+    const existingCardBalance = Math.max(0, input.existingCardBalance);
+    const totalCreditLimit = Math.max(0, input.totalCreditLimit);
+    const blockedAmount = Number((orderPrincipal + existingCardBalance).toFixed(2));
+    const utilizationRatioPercent = totalCreditLimit > 0 ? Number((blockedAmount / totalCreditLimit * 100).toFixed(2)) : 0;
+    let riskTier;
+    let estimatedScoreDropRange;
+    if (utilizationRatioPercent < 30) {
+      riskTier = "SAFE";
+      estimatedScoreDropRange = "0";
+    } else if (utilizationRatioPercent <= 50) {
+      riskTier = "CAUTION";
+      estimatedScoreDropRange = "5-15";
+    } else {
+      riskTier = "DANGER";
+      estimatedScoreDropRange = "20-40";
+    }
+    return {
+      orderPrincipal,
+      existingCardBalance,
+      totalCreditLimit,
+      blockedAmount,
+      utilizationRatioPercent,
+      riskTier,
+      estimatedScoreDropRange
+    };
+  }
+  function calculateForfeitedCardReward(input) {
+    const orderPrincipal = Math.max(0, input.orderPrincipal);
+    const rewardRatePercent = Math.max(0, input.rewardRatePercent);
+    const rewardIfFullSwipe = Number((orderPrincipal * (rewardRatePercent / 100)).toFixed(2));
+    const netCostIfFullSwipe = Number((orderPrincipal - rewardIfFullSwipe).toFixed(2));
+    return {
+      orderPrincipal,
+      rewardRatePercent,
+      rewardIfFullSwipe,
+      netCostIfFullSwipe,
+      forfeitedIfEmi: rewardIfFullSwipe
+    };
+  }
+
+  // src/lib/card-rewards.ts
+  var CARD_REWARD_PROFILES = [
+    {
+      id: "amazon-pay-icici",
+      shortLabel: "Amazon Pay ICICI",
+      bankOrCard: "Amazon Pay ICICI Bank Credit Card",
+      category: "CO_BRANDED",
+      rewardRates: { online: 5, travel: 1, default: 1 },
+      notes: "5% unlimited cashback on Amazon.in for Prime members (3% for non-Prime), 1% elsewhere. Zero cashback on EMI \u2014 confirmed, and expanded from Oct 2025 to also exclude gold, rent, fuel, utilities and international spends."
+    },
+    {
+      id: "flipkart-axis",
+      shortLabel: "Flipkart Axis Bank",
+      bankOrCard: "Flipkart Axis Bank Credit Card",
+      category: "CO_BRANDED",
+      rewardRates: { online: 5, travel: 4, default: 1 },
+      notes: "5% on Flipkart (capped \u20B94,000/quarter), 7.5% on Myntra, 4% unlimited on preferred merchants (Swiggy/Uber/PVR), 1% base elsewhere. EMI forfeits all cashback."
+    },
+    {
+      id: "hdfc-millennia",
+      shortLabel: "HDFC Millennia",
+      bankOrCard: "HDFC Millennia Credit Card",
+      category: "CASHBACK",
+      rewardRates: { online: 5, travel: 1, default: 1 },
+      notes: "5% on 10 named partner brands incl. Amazon/Flipkart/Myntra (capped 1,000 CashPoints/cycle), 1% elsewhere. UNVERIFIED EMI TERMS: sources conflict on whether EMI still earns the 1% since a Sept 2024 change \u2014 treat the forfeiture figure here as an estimate, not a confirmed fact."
+    },
+    {
+      id: "hdfc-regalia-gold",
+      shortLabel: "HDFC Regalia Gold",
+      bankOrCard: "HDFC Regalia Gold Credit Card",
+      category: "PREMIUM_REWARDS",
+      rewardRates: { online: 1.25, travel: 8, default: 1.25 },
+      notes: "Base rate is only ~1.25% (5 pts/\u20B9200) \u2014 Amazon/Flipkart are NOT on its accelerated list. Via SmartBuy: ~12.5% on hotels, ~6.25% on flights. EMI strips all points."
+    },
+    {
+      id: "hdfc-infinia",
+      shortLabel: "HDFC Infinia",
+      bankOrCard: "HDFC Infinia Credit Card",
+      category: "PREMIUM_REWARDS",
+      rewardRates: { online: 3.3, travel: 10, default: 3.3 },
+      notes: "Base 3.3% reward value (5 pts/\u20B9150); up to ~10% via SmartBuy travel after the Jan 2026 cut from 5X to 3X points. Standard SmartBuy bonus stripped on EMI."
+    },
+    {
+      id: "sbi-cashback",
+      shortLabel: "SBI Cashback",
+      bankOrCard: "SBI Cashback Credit Card",
+      category: "CASHBACK",
+      rewardRates: { online: 5, travel: 1, default: 1 },
+      notes: "5% cashback on online spends, capped at \u20B92,000/cycle (i.e. only the first ~\u20B940,000 online spend earns it); \u20B94,000/cycle total cap from Apr 2026. EMIs explicitly excluded."
+    },
+    {
+      id: "axis-atlas",
+      shortLabel: "Axis Atlas",
+      bankOrCard: "Axis Atlas Credit Card",
+      category: "TRAVEL",
+      rewardRates: { online: 2, travel: 5, default: 2 },
+      notes: "5 EDGE Miles/\u20B9100 (~5%) on travel/airline/hotel merchants up to \u20B92L/month, 2 EDGE Miles/\u20B9100 (~2%) on everything else \u2014 including online travel agencies. Zero EDGE Miles on EMI conversions."
+    },
+    {
+      id: "axis-magnus",
+      shortLabel: "Axis Magnus",
+      bankOrCard: "Axis Magnus Credit Card",
+      category: "PREMIUM_REWARDS",
+      rewardRates: { online: 2, travel: 9, default: 2 },
+      notes: "60 EDGE pts/\u20B9200 (~6-12%) via Travel EDGE bookings up to \u20B92L/month; 12 EDGE pts/\u20B9200 (~1.2-2.4%) on regular spends. EMI transactions earn no EDGE Reward Points."
+    },
+    {
+      id: "idfc-first-wealth",
+      shortLabel: "IDFC FIRST Wealth",
+      bankOrCard: "IDFC FIRST Wealth Credit Card",
+      category: "PREMIUM_REWARDS",
+      rewardRates: { online: 0.4, travel: 1.25, default: 0.4 },
+      notes: "Real reward value is modest: 10X pts/\u20B9200 (~1.25%) on dining/travel/international, 3X pts/\u20B9200 (~0.4%) on regular spends. EMI conversions earn no bonus points (only a one-time 5% welcome cashback on your first EMI)."
+    },
+    {
+      id: "au-lit",
+      shortLabel: "AU LIT",
+      bankOrCard: "AU Small Finance Bank LIT Credit Card",
+      category: "CASHBACK",
+      rewardRates: { online: 2, travel: 5, default: 1 },
+      notes: "5% cashback on up to 2 user-chosen categories (travel/dining/grocery/electronics/apparel \u2014 capped), 1 pt/\u20B9100 (~1%) baseline elsewhere. No cashback on EMI."
+    },
+    {
+      id: "kotak-myntra",
+      shortLabel: "Kotak Myntra",
+      bankOrCard: "Kotak Myntra Credit Card",
+      category: "CO_BRANDED",
+      rewardRates: { online: 5, travel: 1.25, default: 1.25 },
+      notes: "DISCONTINUED by Kotak Mahindra Bank on 10 July 2025 \u2014 no longer issued to new applicants; kept here only for existing cardholders. Was 5% on preferred partners (capped \u20B91,000/month), 1.25% elsewhere. EMI transactions explicitly excluded from cashback."
+    },
+    {
+      id: "bobcard-standard",
+      shortLabel: "BOBCARD",
+      bankOrCard: "Bank of Baroda Credit Card",
+      category: "CASHBACK",
+      rewardRates: { online: 1, travel: 1, default: 1 },
+      notes: '"BOBCARD" spans many different card variants (Eterna/Aspire/Prime/Easy) with different terms \u2014 this is a generic 1% base-tier estimate. EMI-forfeiture is assumed (industry-standard) but not separately confirmed for BOBCARD specifically \u2014 use Custom % if you know your exact card.'
+    },
+    {
+      id: "other-standard",
+      shortLabel: "Other / Standard Card",
+      bankOrCard: "Standard Credit or Debit Card",
+      category: "CASHBACK",
+      rewardRates: { online: 1, travel: 1, default: 1 },
+      notes: "Generic 1% baseline used when your specific card is not in this list \u2014 use Custom % for an exact figure."
+    }
+  ];
+  function findCardRewardProfile(id) {
+    return CARD_REWARD_PROFILES.find((c) => c.id === id);
+  }
+  function getCardRewardRate(card, spendCategory) {
+    return card.rewardRates[spendCategory] ?? card.rewardRates.default;
+  }
 
   // src/extension/CommitGuardModal.tsx
+  var SURFACE_LABEL = {
+    AMAZON: "Amazon order",
+    FLIPKART: "Flipkart order",
+    ECOMMERCE: "Online order",
+    TRAVEL: "Trip booking",
+    EDTECH: "Course enrollment",
+    UDEMY: "Course purchase"
+  };
   var ExtensionCommitGuardModal = ({
     surfaceType = "AMAZON",
     productPrice = 5399,
@@ -7646,13 +7728,65 @@
     const TENURE_OPTIONS = [3, 6, 9, 12, 18, 24];
     const [sliderIndex, setSliderIndex] = (0, import_react3.useState)(3);
     const tenure = TENURE_OPTIONS[sliderIndex];
-    const [activeTab, setActiveTab] = (0, import_react3.useState)("CARD_OFFERS");
     const [showAllMethods, setShowAllMethods] = (0, import_react3.useState)(false);
     const [selectedOfferId, setSelectedOfferId] = (0, import_react3.useState)(null);
     const [compoundingHorizon, setCompoundingHorizon] = (0, import_react3.useState)("5Y");
     const [isProofOpen, setIsProofOpen] = (0, import_react3.useState)(false);
+    const [isRecoveryOpen, setIsRecoveryOpen] = (0, import_react3.useState)(false);
+    const [isEmiMathOpen, setIsEmiMathOpen] = (0, import_react3.useState)(false);
+    const [isCurOpen, setIsCurOpen] = (0, import_react3.useState)(false);
+    const [isCardRewardOpen, setIsCardRewardOpen] = (0, import_react3.useState)(false);
     const [customTenure, setCustomTenure] = (0, import_react3.useState)(12);
     const [simulatedTenureOffer, setSimulatedTenureOffer] = (0, import_react3.useState)(null);
+    const CREDIT_LIMIT_PRESETS = [5e4, 1e5, 2e5];
+    const [creditLimitInput, setCreditLimitInput] = (0, import_react3.useState)(1e5);
+    const [existingCardBalanceInput, setExistingCardBalanceInput] = (0, import_react3.useState)(0);
+    const [isCustomLimit, setIsCustomLimit] = (0, import_react3.useState)(false);
+    const QUICK_CARD_IDS = ["amazon-pay-icici", "flipkart-axis", "hdfc-millennia", "sbi-cashback", "hdfc-infinia"];
+    const [selectedCardId, setSelectedCardId] = (0, import_react3.useState)("amazon-pay-icici");
+    const [isCustomCardRate, setIsCustomCardRate] = (0, import_react3.useState)(false);
+    const [customCardRatePercent, setCustomCardRatePercent] = (0, import_react3.useState)(2);
+    const [showFullCardList, setShowFullCardList] = (0, import_react3.useState)(false);
+    const [cardSearchQuery, setCardSearchQuery] = (0, import_react3.useState)("");
+    (0, import_react3.useEffect)(() => {
+      try {
+        if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.sync) {
+          chrome.storage.sync.get(
+            ["commitguard_selected_card_id", "commitguard_custom_card_rate"],
+            (items) => {
+              if (!items) return;
+              if (items.commitguard_selected_card_id === "custom") {
+                setIsCustomCardRate(true);
+                if (typeof items.commitguard_custom_card_rate === "number") {
+                  setCustomCardRatePercent(items.commitguard_custom_card_rate);
+                }
+              } else if (typeof items.commitguard_selected_card_id === "string" && findCardRewardProfile(items.commitguard_selected_card_id)) {
+                setSelectedCardId(items.commitguard_selected_card_id);
+              }
+            }
+          );
+        }
+      } catch (_) {
+      }
+    }, []);
+    const persistCardChoice = (cardId, customRate) => {
+      if (cardId === "custom") {
+        setIsCustomCardRate(true);
+        if (typeof customRate === "number") setCustomCardRatePercent(customRate);
+      } else {
+        setIsCustomCardRate(false);
+        setSelectedCardId(cardId);
+      }
+      try {
+        if (typeof chrome !== "undefined" && chrome.storage && chrome.storage.sync) {
+          chrome.storage.sync.set({
+            commitguard_selected_card_id: cardId,
+            ...typeof customRate === "number" ? { commitguard_custom_card_rate: customRate } : {}
+          });
+        }
+      } catch (_) {
+      }
+    };
     const processingFee = 199;
     const nominalRate = 15;
     const handleSimulateTenure = (months, baseOffer) => {
@@ -7846,6 +7980,41 @@
     const otherOffers = (0, import_react3.useMemo)(() => {
       return allOffers.filter((o) => o.id !== selectedOffer?.id);
     }, [allOffers, selectedOffer]);
+    const isCreditBasedSelection = !!selectedOffer && !/upi|direct debit|cool-off/i.test(selectedOffer.bankOrCard);
+    const hasRealEmiOption = surfaceType !== "UDEMY";
+    const curResult = (0, import_react3.useMemo)(() => {
+      return calculateCreditUtilizationImpact({
+        orderPrincipal: selectedOffer?.netPrice ?? productPrice,
+        existingCardBalance: existingCardBalanceInput,
+        totalCreditLimit: creditLimitInput
+      });
+    }, [selectedOffer, productPrice, existingCardBalanceInput, creditLimitInput]);
+    const spendCategory = surfaceType === "TRAVEL" ? "travel" : "online";
+    const selectedCardProfile = findCardRewardProfile(selectedCardId) || CARD_REWARD_PROFILES[0];
+    const activeCardRatePercent = isCustomCardRate ? customCardRatePercent : getCardRewardRate(selectedCardProfile, spendCategory);
+    const activeCardLabel = isCustomCardRate ? `Custom card (${customCardRatePercent}%)` : selectedCardProfile.shortLabel;
+    const forfeitedRewardResult = (0, import_react3.useMemo)(() => {
+      return calculateForfeitedCardReward({
+        orderPrincipal: selectedOffer?.netPrice ?? productPrice,
+        rewardRatePercent: activeCardRatePercent
+      });
+    }, [selectedOffer, productPrice, activeCardRatePercent]);
+    const filteredCardList = (0, import_react3.useMemo)(() => {
+      const q = cardSearchQuery.trim().toLowerCase();
+      if (!q) return CARD_REWARD_PROFILES;
+      return CARD_REWARD_PROFILES.filter(
+        (c) => c.shortLabel.toLowerCase().includes(q) || c.bankOrCard.toLowerCase().includes(q)
+      );
+    }, [cardSearchQuery]);
+    const verdictLine = (0, import_react3.useMemo)(() => {
+      if (!selectedOffer) return "";
+      if (selectedOffer.rating === "BEST") return `Best value \u2014 ${selectedOffer.effectiveBenefit.toLowerCase()}.`;
+      if (selectedOffer.rating === "AVOID") return `Costs more than it looks \u2014 ${selectedOffer.effectiveBenefit.toLowerCase()}.`;
+      return selectedOffer.effectiveBenefit;
+    }, [selectedOffer]);
+    const ratingInk = (rating) => rating === "BEST" ? "text-ledger-credit" : rating === "AVOID" ? "text-ledger-debit" : "text-ledger-navy";
+    const ratingStampLabel = (rating) => rating === "BEST" ? "Best value" : rating === "AVOID" ? "Costly" : rating === "GOOD" ? "Fair deal" : "";
+    const stampClasses = (rating) => `inline-block -rotate-2 border px-2 py-0.5 text-[11px] font-bold tracking-tight ${rating === "BEST" ? "border-ledger-credit text-ledger-credit" : rating === "AVOID" ? "border-ledger-debit text-ledger-debit" : "border-ledger-navy/40 text-ledger-navy"}`;
     return /* @__PURE__ */ import_react3.default.createElement(
       "div",
       {
@@ -7854,35 +8023,16 @@
           if (e.target === e.currentTarget) onCancelStayOnPage();
         }
       },
-      /* @__PURE__ */ import_react3.default.createElement("div", { className: "commitguard-card" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center justify-between px-6 py-3.5 border-b border-slate-100 bg-white" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2.5 text-slate-900 font-bold text-base sm:text-lg" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: `p-1.5 rounded-lg text-white shadow-sm ${surfaceType === "TRAVEL" ? "bg-sky-600" : surfaceType === "EDTECH" ? "bg-indigo-600" : surfaceType === "UDEMY" ? "bg-purple-600" : surfaceType === "AMAZON" ? "bg-amber-600" : "bg-emerald-600"}` }, surfaceType === "TRAVEL" ? /* @__PURE__ */ import_react3.default.createElement(Plane, { className: "w-5 h-5" }) : surfaceType === "EDTECH" ? /* @__PURE__ */ import_react3.default.createElement(GraduationCap, { className: "w-5 h-5" }) : surfaceType === "UDEMY" ? /* @__PURE__ */ import_react3.default.createElement(BookOpen, { className: "w-5 h-5" }) : surfaceType === "AMAZON" ? /* @__PURE__ */ import_react3.default.createElement(ShoppingBag, { className: "w-5 h-5" }) : /* @__PURE__ */ import_react3.default.createElement(Sparkles, { className: "w-5 h-5" })), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-slate-900" }, surfaceType === "TRAVEL" ? "CommitGuard Travel: TNPL & EMI Reality Check" : surfaceType === "EDTECH" ? "CommitGuard EdTech: Education Loan Subvention Truth" : surfaceType === "UDEMY" ? "CommitGuard Udemy: Impulse Buy & BNPL Interceptor" : surfaceType === "AMAZON" ? "CommitGuard Amazon: Live Card & EMI Optimization" : surfaceType === "FLIPKART" ? "CommitGuard Flipkart: Live Card & EMI Optimization" : "CommitGuard Smart Checkout Intel"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] text-slate-500 font-normal" }, surfaceType === "TRAVEL" ? "MakeMyTrip & Cleartrip: High-APR TNPL Cascades vs 6M Liquid SIP" : surfaceType === "EDTECH" ? "UpGrad: Exposing Hidden Subvention Surcharges & True Debt ROI" : surfaceType === "UDEMY" ? "30-Day Cool-Off & Micro-BNPL Fee Elimination" : "Live Scraped Banking & Friction Engine"))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-3" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 text-[11px] font-mono font-medium" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" }), /* @__PURE__ */ import_react3.default.createElement("span", null, "<1.2ms Real-Time Scraper")), /* @__PURE__ */ import_react3.default.createElement(
+      /* @__PURE__ */ import_react3.default.createElement("div", { className: "commitguard-card" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "bg-ledger-navy px-6 py-4 flex items-center justify-between gap-3" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-3 min-w-0" }, /* @__PURE__ */ import_react3.default.createElement(ShieldCheck, { className: "w-5 h-5 text-ledger-seal shrink-0" }), /* @__PURE__ */ import_react3.default.createElement("div", { className: "min-w-0" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-baseline gap-2 flex-wrap" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-white font-bold text-lg" }, "CommitGuard"), /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-white/50 text-sm font-medium" }, SURFACE_LABEL[surfaceType])), /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-white/70 text-sm mt-0.5" }, "The real cost, before you pay."))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-3 shrink-0" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "hidden sm:flex items-center gap-1.5 text-[11px] text-white/40 font-mono" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "w-1.5 h-1.5 rounded-full bg-ledger-seal animate-pulse" }), "live \xB7 <1.2ms"), /* @__PURE__ */ import_react3.default.createElement(
         "button",
         {
           onClick: onCancelStayOnPage,
-          title: "Cancel & Stay on Page (Escape)",
+          title: "Cancel and stay on page (Escape)",
           "aria-label": "Cancel",
-          className: "p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+          className: "p-1.5 rounded text-white/60 hover:text-white hover:bg-white/10 transition-colors"
         },
-        /* @__PURE__ */ import_react3.default.createElement(X, { className: "w-5 h-5" })
-      ))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "px-6 py-3 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xs font-semibold text-slate-700 truncate max-w-xs sm:max-w-md" }, productName)), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, originalPrice && /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xs text-slate-400 line-through" }, "\u20B9", originalPrice.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-base font-black text-slate-900" }, "\u20B9", productPrice.toLocaleString("en-IN")), discountPercent && /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800" }, discountPercent, "% OFF"))), isMultiItemCart && /* @__PURE__ */ import_react3.default.createElement("div", { className: "mx-6 my-3 p-3.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 shadow-sm text-slate-800" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-start justify-between gap-3" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-start gap-2.5" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "p-1.5 rounded-lg bg-amber-500/10 text-amber-700 mt-0.5 shrink-0" }, /* @__PURE__ */ import_react3.default.createElement(ShoppingBag, { className: "w-4 h-4" })), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex flex-wrap items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xs font-bold text-amber-950 uppercase tracking-wide" }, "Multi-Item Cart Detected"), /* @__PURE__ */ import_react3.default.createElement("span", { className: "px-2 py-0.5 rounded-full bg-amber-200/70 text-amber-900 text-[11px] font-bold" }, cartItemCount, " Items \u2022 \u20B9", productPrice.toLocaleString("en-IN"), " Total"), !multiCartRisk.meetsMinThreshold ? /* @__PURE__ */ import_react3.default.createElement("span", { className: "px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-bold" }, "\u26A0\uFE0F Below \u20B93,000 Minimum for EMI") : /* @__PURE__ */ import_react3.default.createElement("span", { className: "px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold" }, "Cart Meets \u20B93,000 Min")), /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-[12px] text-amber-900/90 mt-1 leading-snug" }, /* @__PURE__ */ import_react3.default.createElement("strong", null, "\u26A0\uFE0F Mixed-Cart EMI Risk:"), " If even ", /* @__PURE__ */ import_react3.default.createElement("em", null, "one"), " item in this cart is ineligible for No-Cost EMI, banks frequently void the merchant discount and charge ", /* @__PURE__ */ import_react3.default.createElement("strong", null, "15% standard loan interest (~\u20B9", multiCartRisk.totalRiskAmount.toLocaleString("en-IN"), " extra)"), " across the entire order!")))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "mt-2.5 pt-2.5 border-t border-amber-200/70 flex flex-wrap items-center justify-between gap-2 text-[11px]" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-1.5 text-amber-950 font-medium" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-emerald-700 font-bold" }, "\u{1F4A1} Split-Order Recommendation:"), /* @__PURE__ */ import_react3.default.createElement("span", null, "Checkout high-ticket EMI item alone to guarantee 100% interest waiver, then buy accessories via UPI.")), cartItemsPreview && cartItemsPreview.length > 0 && /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[10px] text-slate-500 truncate max-w-full italic" }, "Detected in cart: ", cartItemsPreview.slice(0, 3).join(", ")))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex border-b border-slate-200 bg-slate-100/70 p-1.5 gap-1.5" }, /* @__PURE__ */ import_react3.default.createElement(
-        "button",
-        {
-          type: "button",
-          onClick: () => setActiveTab("CARD_OFFERS"),
-          className: `flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${activeTab === "CARD_OFFERS" ? "bg-white text-slate-900 shadow-sm border border-slate-200" : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"}`
-        },
-        /* @__PURE__ */ import_react3.default.createElement(CreditCard, { className: "w-4 h-4 text-emerald-600" }),
-        /* @__PURE__ */ import_react3.default.createElement("span", null, "Card & Payment Intel (Best vs Worst)"),
-        /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 font-mono" }, displayOffers.length, " Options")
-      ), /* @__PURE__ */ import_react3.default.createElement(
-        "button",
-        {
-          type: "button",
-          onClick: () => setActiveTab("EMI_FRICTION"),
-          className: `flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${activeTab === "EMI_FRICTION" ? "bg-white text-slate-900 shadow-sm border border-slate-200" : "text-slate-600 hover:text-slate-900 hover:bg-slate-200/60"}`
-        },
-        /* @__PURE__ */ import_react3.default.createElement(TriangleAlert, { className: "w-4 h-4 text-amber-500" }),
-        /* @__PURE__ */ import_react3.default.createElement("span", null, surfaceType === "UDEMY" ? `Installment / BNPL Friction (Save \u20B9${recoveryCompounding.savedFriction})` : `No-Cost EMI Friction (${mathResult.effectiveAnnualPercentageRate}% APR)`)
-      )), /* @__PURE__ */ import_react3.default.createElement("div", { className: "p-6 space-y-5 max-h-[75vh] overflow-y-auto" }, activeTab === "CARD_OFFERS" && /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "rounded-xl border border-slate-200 bg-white shadow-xs p-3.5 space-y-2.5" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center justify-between text-xs" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-bold text-slate-700 flex items-center gap-1.5" }, /* @__PURE__ */ import_react3.default.createElement(Sparkles, { className: "w-3.5 h-3.5 text-emerald-600" }), /* @__PURE__ */ import_react3.default.createElement("span", null, "Payment Methods Discovered on Page:")), /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-[10px] text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200" }, "Live Scraped")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex flex-wrap gap-1.5" }, allOffers.map((offer) => /* @__PURE__ */ import_react3.default.createElement(
+        /* @__PURE__ */ import_react3.default.createElement(X, { className: "w-4 h-4" })
+      ))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "bg-ledger-paper max-h-[85vh] overflow-y-auto" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "px-6 py-3.5 border-b border-ledger-rule flex items-center justify-between gap-3" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-base font-semibold text-ledger-navy truncate" }, productName), /* @__PURE__ */ import_react3.default.createElement("span", { className: "flex items-baseline gap-2 shrink-0 font-mono tabular-nums" }, typeof originalPrice === "number" && originalPrice > 0 && /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-sm text-ledger-navy/40 line-through" }, "\u20B9", originalPrice.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xl font-bold text-ledger-navy" }, "\u20B9", productPrice.toLocaleString("en-IN")), typeof discountPercent === "number" && discountPercent > 0 && /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-[11px] font-bold text-ledger-credit" }, discountPercent, "% off"))), isMultiItemCart && /* @__PURE__ */ import_react3.default.createElement("div", { className: "mx-6 mt-3.5 p-3 border border-ledger-rule bg-white text-sm text-ledger-navy space-y-1.5" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center justify-between gap-2 flex-wrap" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-bold" }, cartItemCount, " items in this cart \xB7 \u20B9", productPrice.toLocaleString("en-IN"), " total"), /* @__PURE__ */ import_react3.default.createElement("span", { className: `font-mono tabular-nums font-bold ${multiCartRisk.meetsMinThreshold ? "text-ledger-credit" : "text-ledger-debit"}` }, multiCartRisk.meetsMinThreshold ? "Meets EMI minimum" : "Below \u20B93,000 EMI minimum")), /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-ledger-navy/70 leading-relaxed" }, "If even one item here doesn't qualify for No-Cost EMI, banks often void the discount for the whole order \u2014 that could add roughly \u20B9", multiCartRisk.totalRiskAmount.toLocaleString("en-IN"), " in standard interest. Checking out the high-value item alone keeps the EMI discount intact."), cartItemsPreview && cartItemsPreview.length > 0 && /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-ledger-navy/40 text-xs italic" }, "In cart: ", cartItemsPreview.slice(0, 3).join(", "))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "px-6 py-4 space-y-4" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center justify-between text-sm" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-semibold text-ledger-navy/70" }, "Payment methods on this page"), /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-[11px] font-mono text-ledger-navy/40" }, "scraped live")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex flex-wrap gap-1.5" }, allOffers.map((offer) => /* @__PURE__ */ import_react3.default.createElement(
         "button",
         {
           key: offer.id,
@@ -7891,52 +8041,174 @@
             setSimulatedTenureOffer(null);
             setSelectedOfferId(offer.id);
           },
-          className: `px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5 ${selectedOffer?.id === offer.id ? "bg-slate-900 text-white border-slate-900 shadow-xs" : "bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200 font-medium"}`
+          className: `px-3 py-1.5 text-sm font-semibold border transition-colors ${selectedOffer?.id === offer.id ? "bg-ledger-navy text-white border-ledger-navy" : "bg-white text-ledger-navy/80 border-ledger-rule hover:border-ledger-navy/40"}`
         },
-        /* @__PURE__ */ import_react3.default.createElement("span", null, offer.bankOrCard),
-        offer.rating === "BEST" && /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-emerald-400 text-[10px]" }, "\u2605")
-      ))), selectedOffer && !/upi|direct|cool-off/i.test(selectedOffer.bankOrCard) && /* @__PURE__ */ import_react3.default.createElement("div", { className: "pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-[11px] font-bold text-slate-600 flex items-center gap-1" }, /* @__PURE__ */ import_react3.default.createElement("span", null, "Simulate EMI Tenure on this Card:")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-1.5" }, [3, 6, 9, 12, 18, 24, 36].map((m) => /* @__PURE__ */ import_react3.default.createElement(
+        offer.bankOrCard
+      ))), selectedOffer && !/upi|direct|cool-off/i.test(selectedOffer.bankOrCard) && /* @__PURE__ */ import_react3.default.createElement("div", { className: "pt-2 border-t border-ledger-rule flex flex-wrap items-center justify-between gap-2" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xs font-semibold text-ledger-navy/70" }, "Try a different tenure on this card:"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-1.5" }, [3, 6, 9, 12, 18, 24, 36].map((m) => /* @__PURE__ */ import_react3.default.createElement(
         "button",
         {
           key: m,
           type: "button",
           onClick: () => handleSimulateTenure(m, selectedOffer),
-          className: `px-2.5 py-1 rounded-md text-[11px] font-mono font-bold transition-all cursor-pointer border ${customTenure === m && simulatedTenureOffer ? "bg-emerald-600 text-white border-emerald-600 shadow-xs" : "bg-white hover:bg-slate-100 text-slate-700 border-slate-200"}`
+          className: `px-2 py-1 text-xs font-mono tabular-nums font-bold border transition-colors ${customTenure === m && simulatedTenureOffer ? "bg-ledger-navy text-white border-ledger-navy" : "bg-white text-ledger-navy/70 border-ledger-rule hover:border-ledger-navy/40"}`
         },
         m,
         "m"
-      ))))), selectedOffer && /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-2.5" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-900 text-white inline-flex items-center gap-1.5 shadow-sm" }, /* @__PURE__ */ import_react3.default.createElement(Zap, { className: "w-3 h-3 text-amber-400" }), /* @__PURE__ */ import_react3.default.createElement("span", null, "Your Selected Payment Option")), /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-[11px] font-semibold text-slate-500" }, "Live Pre-Commitment Reality Check")), /* @__PURE__ */ import_react3.default.createElement(
-        "div",
-        {
-          className: `p-4 rounded-xl border-2 transition-all ${selectedOffer.rating === "BEST" ? "bg-emerald-50/90 border-emerald-400 ring-2 ring-emerald-200" : selectedOffer.rating === "AVOID" ? "bg-red-50/90 border-red-300 ring-2 ring-red-100" : "bg-sky-50/90 border-sky-300 ring-2 ring-sky-100"}`
-        },
-        /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-start justify-between gap-3" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-1.5 flex-1" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2 flex-wrap" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-black text-base text-slate-900" }, selectedOffer.bankOrCard), selectedOffer.rating === "BEST" && /* @__PURE__ */ import_react3.default.createElement("span", { className: "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-600 text-white shadow-sm" }, /* @__PURE__ */ import_react3.default.createElement(ThumbsUp, { className: "w-3 h-3" }), "RECOMMENDED: BEST VALUE"), selectedOffer.rating === "GOOD" && /* @__PURE__ */ import_react3.default.createElement("span", { className: "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200" }, "GOOD OFFER"), selectedOffer.rating === "AVOID" && /* @__PURE__ */ import_react3.default.createElement("span", { className: "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 text-red-800 border border-red-200" }, /* @__PURE__ */ import_react3.default.createElement(ThumbsDown, { className: "w-3 h-3 text-red-600" }), "AVOID: HIDDEN CHARGES")), /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-xs text-slate-700 font-medium" }, selectedOffer.description), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-xs text-slate-800 font-normal flex items-start gap-1.5 pt-1 bg-white/70 p-2 rounded-lg border border-slate-200/60" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "w-2 h-2 rounded-full bg-slate-500 mt-1 shrink-0" }), /* @__PURE__ */ import_react3.default.createElement("span", null, selectedOffer.reason))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-right shrink-0 bg-white/80 p-2.5 rounded-xl border border-slate-200/80 shadow-xs" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] text-slate-500 font-semibold" }, "True Outflow"), /* @__PURE__ */ import_react3.default.createElement("div", { className: `text-lg font-black ${selectedOffer.rating === "BEST" ? "text-emerald-700" : selectedOffer.rating === "AVOID" ? "text-red-600" : "text-slate-900"}` }, "\u20B9", selectedOffer.netPrice.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("div", { className: `text-[10px] font-bold mt-0.5 ${selectedOffer.rating === "BEST" ? "text-emerald-600" : selectedOffer.rating === "AVOID" ? "text-red-700" : "text-slate-600"}` }, selectedOffer.effectiveBenefit)))
-      )), otherOffers.length > 0 && /* @__PURE__ */ import_react3.default.createElement("div", { className: "pt-1" }, /* @__PURE__ */ import_react3.default.createElement(
+      ))))), selectedOffer && /* @__PURE__ */ import_react3.default.createElement("div", { className: "border-t-2 border-b-2 border-ledger-navy py-3.5 space-y-2" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-start justify-between gap-3" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-1 min-w-0" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2 flex-wrap" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xs font-semibold text-ledger-navy/50" }, "You selected"), ratingStampLabel(selectedOffer.rating) && /* @__PURE__ */ import_react3.default.createElement("span", { className: stampClasses(selectedOffer.rating) }, ratingStampLabel(selectedOffer.rating))), /* @__PURE__ */ import_react3.default.createElement("p", { className: "font-bold text-ledger-navy text-lg leading-tight" }, selectedOffer.bankOrCard), /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-sm text-ledger-navy/70" }, verdictLine)), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-right shrink-0" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-xs text-ledger-navy/50 font-semibold" }, "True cost"), /* @__PURE__ */ import_react3.default.createElement("div", { className: `text-2xl font-bold font-mono tabular-nums ${ratingInk(selectedOffer.rating)}` }, "\u20B9", selectedOffer.netPrice.toLocaleString("en-IN")))), /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-sm text-ledger-navy/80 leading-relaxed border-l-2 border-ledger-rule pl-2.5" }, selectedOffer.reason)), /* @__PURE__ */ import_react3.default.createElement("div", { className: "divide-y divide-ledger-rule border border-ledger-rule bg-white" }, otherOffers.length > 0 && /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement(
         "button",
         {
           type: "button",
           onClick: () => setShowAllMethods(!showAllMethods),
-          className: "w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-between transition-colors border border-slate-200"
+          className: "w-full px-3.5 py-2.5 flex items-center justify-between text-sm font-semibold text-ledger-navy hover:bg-ledger-paper/60 transition-colors"
         },
-        /* @__PURE__ */ import_react3.default.createElement("span", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement(SlidersVertical, { className: "w-3.5 h-3.5 text-slate-600" }), /* @__PURE__ */ import_react3.default.createElement("span", null, showAllMethods ? "Hide Alternative Payment Methods" : `View & Compare Other Payment Methods (${otherOffers.length} Available)`)),
-        showAllMethods ? /* @__PURE__ */ import_react3.default.createElement(ChevronUp, { className: "w-4 h-4 text-slate-600" }) : /* @__PURE__ */ import_react3.default.createElement(ChevronDown, { className: "w-4 h-4 text-slate-600" })
-      ), showAllMethods && /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-2.5 mt-3 animate-in fade-in duration-200" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] font-semibold text-slate-500 flex items-center justify-between px-1" }, /* @__PURE__ */ import_react3.default.createElement("span", null, "Click any method to inspect its Reality Check:"), /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-[10px] text-emerald-700 font-mono font-bold" }, "\u{1F446} Click to Switch")), otherOffers.map((offer) => {
-        const isBest = offer.rating === "BEST";
-        const isAvoid = offer.rating === "AVOID";
-        const isGood = offer.rating === "GOOD";
-        return /* @__PURE__ */ import_react3.default.createElement(
-          "div",
-          {
-            key: offer.id,
-            onClick: () => setSelectedOfferId(offer.id),
-            role: "button",
-            tabIndex: 0,
-            className: `p-3.5 rounded-xl border transition-all cursor-pointer hover:shadow-md hover:scale-[1.01] active:scale-[0.99] group ${isBest ? "bg-emerald-50/70 hover:bg-emerald-100/80 border-emerald-300 ring-1 ring-emerald-200" : isAvoid ? "bg-red-50/60 hover:bg-red-100/80 border-red-200" : "bg-white hover:bg-slate-50 border-slate-200"}`,
-            title: "Click to select this payment method and inspect its reality check"
+        /* @__PURE__ */ import_react3.default.createElement("span", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement(SlidersVertical, { className: "w-3.5 h-3.5 text-ledger-navy/50" }), "Compare other ways to pay (", otherOffers.length, ")"),
+        showAllMethods ? /* @__PURE__ */ import_react3.default.createElement(ChevronUp, { className: "w-4 h-4" }) : /* @__PURE__ */ import_react3.default.createElement(ChevronDown, { className: "w-4 h-4" })
+      ), showAllMethods && /* @__PURE__ */ import_react3.default.createElement("div", { className: "px-3.5 pb-3.5 space-y-2" }, otherOffers.map((offer) => /* @__PURE__ */ import_react3.default.createElement(
+        "button",
+        {
+          key: offer.id,
+          type: "button",
+          onClick: () => setSelectedOfferId(offer.id),
+          className: "w-full text-left p-3 border border-ledger-rule hover:border-ledger-navy/40 transition-colors"
+        },
+        /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-start justify-between gap-3" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-1 min-w-0" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2 flex-wrap" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-semibold text-base text-ledger-navy" }, offer.bankOrCard), ratingStampLabel(offer.rating) && /* @__PURE__ */ import_react3.default.createElement("span", { className: stampClasses(offer.rating) }, ratingStampLabel(offer.rating))), /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-sm text-ledger-navy/60" }, offer.description)), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-right shrink-0" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: `text-base font-bold font-mono tabular-nums ${ratingInk(offer.rating)}` }, "\u20B9", offer.netPrice.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] text-ledger-navy/50" }, offer.effectiveBenefit)))
+      )))), isCreditBasedSelection && /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement(
+        "button",
+        {
+          type: "button",
+          onClick: () => setIsCurOpen(!isCurOpen),
+          className: "w-full px-3.5 py-2.5 flex items-center justify-between text-sm font-semibold text-ledger-navy hover:bg-ledger-paper/60 transition-colors"
+        },
+        /* @__PURE__ */ import_react3.default.createElement("span", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement(CreditCard, { className: "w-3.5 h-3.5 text-ledger-navy/50" }), "Credit limit impact", /* @__PURE__ */ import_react3.default.createElement("span", { className: `font-mono tabular-nums text-xs ${curResult.riskTier === "DANGER" ? "text-ledger-debit" : curResult.riskTier === "CAUTION" ? "text-ledger-seal" : "text-ledger-credit"}` }, curResult.utilizationRatioPercent, "%")),
+        isCurOpen ? /* @__PURE__ */ import_react3.default.createElement(ChevronUp, { className: "w-4 h-4" }) : /* @__PURE__ */ import_react3.default.createElement(ChevronDown, { className: "w-4 h-4" })
+      ), isCurOpen && /* @__PURE__ */ import_react3.default.createElement("div", { className: "px-3.5 pb-3.5 space-y-3" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center justify-between gap-2 flex-wrap" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xs font-semibold text-ledger-navy/60" }, "Your total card limit"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-1.5 flex-wrap" }, CREDIT_LIMIT_PRESETS.map((preset) => /* @__PURE__ */ import_react3.default.createElement(
+        "button",
+        {
+          key: preset,
+          type: "button",
+          onClick: () => {
+            setCreditLimitInput(preset);
+            setIsCustomLimit(false);
           },
-          /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-start justify-between gap-3" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2 flex-wrap" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-bold text-sm text-slate-900 group-hover:text-emerald-700 transition-colors" }, offer.bankOrCard), isBest && /* @__PURE__ */ import_react3.default.createElement("span", { className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-600 text-white shadow-xs" }, /* @__PURE__ */ import_react3.default.createElement(ThumbsUp, { className: "w-2.5 h-2.5" }), "RECOMMENDED: BEST VALUE"), isGood && /* @__PURE__ */ import_react3.default.createElement("span", { className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200" }, "GOOD OFFER"), isAvoid && /* @__PURE__ */ import_react3.default.createElement("span", { className: "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 text-red-800 border border-red-200" }, /* @__PURE__ */ import_react3.default.createElement(ThumbsDown, { className: "w-2.5 h-2.5 text-red-600" }), "AVOID: HIDDEN CHARGES")), /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-xs text-slate-600" }, offer.description), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] text-slate-700 font-medium flex items-center gap-1.5 pt-0.5" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "w-1.5 h-1.5 rounded-full bg-slate-400" }), /* @__PURE__ */ import_react3.default.createElement("span", null, offer.reason))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-right shrink-0" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-xs text-slate-500 font-medium" }, "Effective Price"), /* @__PURE__ */ import_react3.default.createElement("div", { className: `text-base font-black ${isBest ? "text-emerald-700" : isAvoid ? "text-red-600" : "text-slate-900"}` }, "\u20B9", offer.netPrice.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("div", { className: `text-[10px] font-bold ${isBest ? "text-emerald-600" : isAvoid ? "text-red-700" : "text-slate-600"}` }, offer.effectiveBenefit), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[9px] text-slate-400 mt-1 font-semibold group-hover:text-emerald-600" }, "Select \u2794")))
+          className: `px-2.5 py-1 text-xs font-semibold border transition-colors ${!isCustomLimit && creditLimitInput === preset ? "bg-ledger-navy text-white border-ledger-navy" : "bg-white text-ledger-navy/70 border-ledger-rule hover:border-ledger-navy/40"}`
+        },
+        preset >= 1e5 ? `\u20B9${preset / 1e5}L` : `\u20B9${preset / 1e3}k`
+      )), /* @__PURE__ */ import_react3.default.createElement(
+        "button",
+        {
+          type: "button",
+          onClick: () => setIsCustomLimit(true),
+          className: `px-2.5 py-1 text-xs font-semibold border transition-colors ${isCustomLimit ? "bg-ledger-navy text-white border-ledger-navy" : "bg-white text-ledger-navy/70 border-ledger-rule hover:border-ledger-navy/40"}`
+        },
+        "Custom"
+      ))), isCustomLimit && /* @__PURE__ */ import_react3.default.createElement(
+        "input",
+        {
+          type: "number",
+          min: 0,
+          value: creditLimitInput,
+          onChange: (e) => setCreditLimitInput(Math.max(0, Number(e.target.value) || 0)),
+          placeholder: "Your total credit limit (\u20B9)",
+          className: "w-full px-3 py-1.5 border border-ledger-rule text-sm font-semibold text-ledger-navy focus:outline-none focus:border-ledger-navy bg-white"
+        }
+      ), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xs font-semibold text-ledger-navy/60 shrink-0" }, "Already spent on this card"), /* @__PURE__ */ import_react3.default.createElement(
+        "input",
+        {
+          type: "number",
+          min: 0,
+          value: existingCardBalanceInput || "",
+          onChange: (e) => setExistingCardBalanceInput(Math.max(0, Number(e.target.value) || 0)),
+          placeholder: "\u20B90",
+          className: "w-28 px-2.5 py-1 border border-ledger-rule text-xs font-mono tabular-nums text-ledger-navy focus:outline-none focus:border-ledger-navy bg-white"
+        }
+      )), /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center justify-between text-xs font-mono tabular-nums" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-ledger-navy/60" }, "\u20B9", curResult.blockedAmount.toLocaleString("en-IN"), " of \u20B9", curResult.totalCreditLimit.toLocaleString("en-IN"), " blocked")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "h-1.5 w-full bg-ledger-rule/60" }, /* @__PURE__ */ import_react3.default.createElement(
+        "div",
+        {
+          className: `h-full ${curResult.riskTier === "SAFE" ? "bg-ledger-credit" : curResult.riskTier === "CAUTION" ? "bg-ledger-seal" : "bg-ledger-debit"}`,
+          style: { width: `${Math.min(100, curResult.utilizationRatioPercent)}%` }
+        }
+      ))), /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-sm text-ledger-navy/80 leading-relaxed border-l-2 border-ledger-rule pl-2.5" }, curResult.riskTier === "SAFE" && `This uses only ${curResult.utilizationRatioPercent}% of your limit \u2014 no expected score impact.`, curResult.riskTier === "CAUTION" && `This locks ${curResult.utilizationRatioPercent}% of your \u20B9${curResult.totalCreditLimit.toLocaleString("en-IN")} limit \u2014 may cause a minor score dip (est. ${curResult.estimatedScoreDropRange} pts) if it stays high through your next billing cycle.`, curResult.riskTier === "DANGER" && `This locks ${curResult.utilizationRatioPercent}% of your \u20B9${curResult.totalCreditLimit.toLocaleString("en-IN")} limit \u2014 expect an estimated ${curResult.estimatedScoreDropRange} point score drop on your next report.`))), isCreditBasedSelection && /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement(
+        "button",
+        {
+          type: "button",
+          onClick: () => setIsCardRewardOpen(!isCardRewardOpen),
+          className: "w-full px-3.5 py-2.5 flex items-center justify-between text-sm font-semibold text-ledger-navy hover:bg-ledger-paper/60 transition-colors"
+        },
+        /* @__PURE__ */ import_react3.default.createElement("span", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement(Wallet, { className: "w-3.5 h-3.5 text-ledger-navy/50" }), "Card reward check", /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-mono tabular-nums text-xs text-ledger-debit" }, "-\u20B9", forfeitedRewardResult.forfeitedIfEmi.toLocaleString("en-IN"))),
+        isCardRewardOpen ? /* @__PURE__ */ import_react3.default.createElement(ChevronUp, { className: "w-4 h-4" }) : /* @__PURE__ */ import_react3.default.createElement(ChevronDown, { className: "w-4 h-4" })
+      ), isCardRewardOpen && /* @__PURE__ */ import_react3.default.createElement("div", { className: "px-3.5 pb-3.5 space-y-3" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xs font-semibold text-ledger-navy/60" }, "Which card are you using?"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-1.5 flex-wrap" }, QUICK_CARD_IDS.map((id) => {
+        const card = findCardRewardProfile(id);
+        if (!card) return null;
+        const isActive = !isCustomCardRate && selectedCardId === id;
+        return /* @__PURE__ */ import_react3.default.createElement(
+          "button",
+          {
+            key: id,
+            type: "button",
+            onClick: () => persistCardChoice(id),
+            className: `px-2.5 py-1 text-xs font-semibold border transition-colors ${isActive ? "bg-ledger-navy text-white border-ledger-navy" : "bg-white text-ledger-navy/70 border-ledger-rule hover:border-ledger-navy/40"}`
+          },
+          card.shortLabel
         );
-      }))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-1" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "font-bold text-slate-900 flex items-center gap-1.5" }, /* @__PURE__ */ import_react3.default.createElement(ShieldCheck, { className: "w-4 h-4 text-emerald-600" }), /* @__PURE__ */ import_react3.default.createElement("span", null, surfaceType === "TRAVEL" ? "CommitGuard Travel Advisory (TNPL Warning):" : surfaceType === "EDTECH" ? "CommitGuard EdTech Advisory (Subvention Reality):" : surfaceType === "UDEMY" ? "CommitGuard Udemy Advisory (Impulse & Artificial Scarcity):" : surfaceType === "AMAZON" ? "CommitGuard Amazon Advisory (Cashback vs EMI Drag):" : "CommitGuard Flipkart Advisory (Cashback vs EMI Drag):")), /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-slate-600 text-[11px] leading-relaxed" }, surfaceType === "TRAVEL" ? /* @__PURE__ */ import_react3.default.createElement(import_react3.default.Fragment, null, /* @__PURE__ */ import_react3.default.createElement("strong", null, "Travel Now, Pay Later (TNPL)"), " advertises low monthly tranches but triggers ", /* @__PURE__ */ import_react3.default.createElement("strong", null, "24% to 36% penalty APRs"), " and compounding bounce fees if any installment is missed post-trip. ", /* @__PURE__ */ import_react3.default.createElement("strong", null, "Recommended Alternative:"), " Start a ", /* @__PURE__ */ import_react3.default.createElement("strong", null, "6-month Liquid Fund SIP"), " at 7.10% yield to book your trip 100% debt-free.") : surfaceType === "EDTECH" ? /* @__PURE__ */ import_react3.default.createElement(import_react3.default.Fragment, null, /* @__PURE__ */ import_react3.default.createElement("strong", null, 'Education Loan "0% Subvention"'), " packages frequently embed an upfront ", /* @__PURE__ */ import_react3.default.createElement("strong", null, "3% to 5% institutional subvention surcharge"), " into course pricing plus processing fees. If you pay via direct NEFT/UPI or company sponsorship, negotiate the 5% cash rebate.") : surfaceType === "UDEMY" ? /* @__PURE__ */ import_react3.default.createElement(import_react3.default.Fragment, null, /* @__PURE__ */ import_react3.default.createElement("strong", null, "Udemy Countdown Timers:"), ' The "Sale ends in 5 hours" timer resets automatically on next browser session. Over ', /* @__PURE__ */ import_react3.default.createElement("strong", null, "87% of purchased self-paced courses are never completed"), ". If paying, use direct UPI without EMI lock-ins, or invest in a ", /* @__PURE__ */ import_react3.default.createElement("strong", null, "Liquid Fund"), " until you have scheduled hours to study.") : surfaceType === "AMAZON" ? /* @__PURE__ */ import_react3.default.createElement(import_react3.default.Fragment, null, "If you hold an ", /* @__PURE__ */ import_react3.default.createElement("strong", null, "Amazon Pay ICICI Card"), ", pay in full to lock an unconditional ", /* @__PURE__ */ import_react3.default.createElement("strong", null, "5% Amazon Pay balance cashback"), ". If you choose ", /* @__PURE__ */ import_react3.default.createElement("strong", null, "No-Cost EMI"), ", you will lose ~\u20B9", mathResult.totalHiddenFriction.toLocaleString("en-IN"), " to non-refundable 18% GST on interest and bank processing fees.") : /* @__PURE__ */ import_react3.default.createElement(import_react3.default.Fragment, null, "If you hold a ", /* @__PURE__ */ import_react3.default.createElement("strong", null, "Flipkart Axis Bank Card"), ", pay in full to lock an unconditional ", /* @__PURE__ */ import_react3.default.createElement("strong", null, "5% statement cashback"), ". If you use ", /* @__PURE__ */ import_react3.default.createElement("strong", null, "No-Cost EMI"), ", you will lose ~\u20B9", mathResult.totalHiddenFriction.toLocaleString("en-IN"), " to non-refundable 18% GST and processing fees.")))), activeTab === "EMI_FRICTION" && /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-5" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "grid grid-cols-1 sm:grid-cols-3 gap-3" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "p-3.5 rounded-xl bg-red-50 border border-red-200" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] font-bold text-red-800 uppercase tracking-wide" }, "Effective APR"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-2xl font-black text-red-600 mt-1" }, mathResult.effectiveAnnualPercentageRate, "%"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[10px] text-red-700/80 mt-0.5" }, "vs Advertised ", /* @__PURE__ */ import_react3.default.createElement("strong", null, "0% APR"))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "p-3.5 rounded-xl bg-amber-50 border border-amber-200" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] font-bold text-amber-800 uppercase tracking-wide" }, "Total GST + Fee Drag"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-2xl font-black text-amber-700 mt-1" }, "\u20B9", mathResult.totalHiddenFriction.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[10px] text-amber-800/80 mt-0.5" }, "\u20B9", processingFee, " fee + \u20B9", mathResult.totalGstOnInterest.toFixed(2), " GST")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "p-3.5 rounded-xl bg-slate-50 border border-slate-200" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] font-bold text-slate-700 uppercase tracking-wide" }, "Monthly Outflow"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-2xl font-black text-slate-900 mt-1" }, "\u20B9", mathResult.monthlyBaseEmi.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[10px] text-slate-500 mt-0.5" }, "Locked for ", tenure, " installments"))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-800" }, /* @__PURE__ */ import_react3.default.createElement(ShieldCheck, { className: "w-4 h-4 text-emerald-600" }), /* @__PURE__ */ import_react3.default.createElement("span", null, "3-Bullet Plain-English Translation")), /* @__PURE__ */ import_react3.default.createElement("ul", { className: "space-y-2 text-xs sm:text-sm text-slate-700 leading-relaxed" }, /* @__PURE__ */ import_react3.default.createElement("li", { className: "flex items-start gap-2.5" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "w-2 h-2 rounded-full bg-red-600 mt-1.5 shrink-0" }), /* @__PURE__ */ import_react3.default.createElement("span", null, /* @__PURE__ */ import_react3.default.createElement("strong", { className: "text-red-700 font-bold" }, "19.93% Effective APR Reality: "), "Even though the merchant provides an upfront discount, bank processing fees and statutory 18% GST convert 0% into ", /* @__PURE__ */ import_react3.default.createElement("strong", null, mathResult.effectiveAnnualPercentageRate, "% Effective APR"), ".")), /* @__PURE__ */ import_react3.default.createElement("li", { className: "flex items-start gap-2.5" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "w-2 h-2 rounded-full bg-amber-600 mt-1.5 shrink-0" }), /* @__PURE__ */ import_react3.default.createElement("span", null, /* @__PURE__ */ import_react3.default.createElement("strong", { className: "text-slate-900 font-bold" }, "Unrecoverable Monthly Drag: "), "Every month, your bank card statement bills 18% statutory GST on the interest component. You incur a guaranteed ", /* @__PURE__ */ import_react3.default.createElement("strong", null, "\u20B9", mathResult.totalHiddenFriction.toLocaleString("en-IN")), " in pure administrative leak.")), /* @__PURE__ */ import_react3.default.createElement("li", { className: "flex items-start gap-2.5" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "w-2 h-2 rounded-full bg-emerald-600 mt-1.5 shrink-0" }), /* @__PURE__ */ import_react3.default.createElement("span", null, /* @__PURE__ */ import_react3.default.createElement("strong", { className: "text-emerald-800 font-bold" }, "Zero-Friction Baseline: "), "Paying upfront via direct UPI or debit card eliminates the \u20B9", mathResult.totalHiddenFriction.toLocaleString("en-IN"), " drag completely while keeping your monthly credit limit untouched.")))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "p-4 rounded-xl border border-slate-200 bg-white shadow-sm space-y-3" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center justify-between text-xs" }, /* @__PURE__ */ import_react3.default.createElement("label", { htmlFor: "ext-tenure-slider", className: "font-bold text-slate-900 flex items-center gap-1.5" }, /* @__PURE__ */ import_react3.default.createElement(SlidersVertical, { className: "w-4 h-4 text-emerald-600" }), /* @__PURE__ */ import_react3.default.createElement("span", null, "Adjust EMI Tenure: ", /* @__PURE__ */ import_react3.default.createElement("strong", { className: "text-emerald-700 text-sm" }, tenure, " Months"))), /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-[11px] text-slate-500 font-mono" }, "Click any tenure step")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "relative pt-1 pb-1" }, /* @__PURE__ */ import_react3.default.createElement(
+      }), /* @__PURE__ */ import_react3.default.createElement(
+        "button",
+        {
+          type: "button",
+          onClick: () => setShowFullCardList(!showFullCardList),
+          className: "px-2.5 py-1 text-xs font-semibold border border-dashed border-ledger-navy/30 text-ledger-navy/60 hover:border-ledger-navy/60 inline-flex items-center gap-1"
+        },
+        showFullCardList ? /* @__PURE__ */ import_react3.default.createElement(ChevronUp, { className: "w-3 h-3" }) : /* @__PURE__ */ import_react3.default.createElement(ChevronDown, { className: "w-3 h-3" }),
+        "More cards"
+      ), /* @__PURE__ */ import_react3.default.createElement(
+        "button",
+        {
+          type: "button",
+          onClick: () => persistCardChoice("custom", customCardRatePercent),
+          className: `px-2.5 py-1 text-xs font-semibold border transition-colors ${isCustomCardRate ? "bg-ledger-navy text-white border-ledger-navy" : "bg-white text-ledger-navy/70 border-ledger-rule hover:border-ledger-navy/40"}`
+        },
+        "Custom %"
+      ))), showFullCardList && /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-1.5 pt-1 border-t border-ledger-rule" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "relative" }, /* @__PURE__ */ import_react3.default.createElement(Search, { className: "w-3.5 h-3.5 text-ledger-navy/40 absolute left-2.5 top-1/2 -translate-y-1/2" }), /* @__PURE__ */ import_react3.default.createElement(
+        "input",
+        {
+          type: "text",
+          value: cardSearchQuery,
+          onChange: (e) => setCardSearchQuery(e.target.value),
+          placeholder: "Search your bank or card (e.g. Axis, HDFC, SBI)",
+          className: "w-full pl-8 pr-3 py-1.5 border border-ledger-rule text-sm font-medium text-ledger-navy focus:outline-none focus:border-ledger-navy bg-white"
+        }
+      )), /* @__PURE__ */ import_react3.default.createElement("div", { className: "max-h-36 overflow-y-auto space-y-1 pr-1" }, filteredCardList.map((card) => /* @__PURE__ */ import_react3.default.createElement(
+        "button",
+        {
+          key: card.id,
+          type: "button",
+          onClick: () => {
+            persistCardChoice(card.id);
+            setShowFullCardList(false);
+          },
+          className: `w-full text-left px-2.5 py-1.5 text-xs font-semibold border transition-colors ${!isCustomCardRate && selectedCardId === card.id ? "bg-ledger-navy text-white border-ledger-navy" : "bg-white text-ledger-navy/70 border-ledger-rule hover:border-ledger-navy/40"}`
+        },
+        card.bankOrCard
+      )), filteredCardList.length === 0 && /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-xs text-ledger-navy/50 px-1 py-2" }, 'No match \u2014 use "Custom %" instead.'))), isCustomCardRate && /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xs font-semibold text-ledger-navy/60 shrink-0" }, "Your card's reward rate"), /* @__PURE__ */ import_react3.default.createElement(
+        "input",
+        {
+          type: "number",
+          min: 0,
+          max: 20,
+          step: 0.1,
+          value: customCardRatePercent,
+          onChange: (e) => persistCardChoice("custom", Math.max(0, Number(e.target.value) || 0)),
+          className: "w-20 px-2.5 py-1 border border-ledger-rule text-xs font-mono tabular-nums text-ledger-navy focus:outline-none focus:border-ledger-navy bg-white"
+        }
+      ), /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xs font-semibold text-ledger-navy/60" }, "%")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "grid grid-cols-2 divide-x divide-ledger-rule border border-ledger-rule" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "p-2.5" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] font-semibold text-ledger-navy/50" }, "Full-swipe reward"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-base font-bold font-mono tabular-nums text-ledger-credit" }, "+\u20B9", forfeitedRewardResult.rewardIfFullSwipe.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] text-ledger-navy/50" }, activeCardLabel, " @ ", activeCardRatePercent, "%")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "p-2.5" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] font-semibold text-ledger-navy/50" }, "Forfeited on EMI"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-base font-bold font-mono tabular-nums text-ledger-debit" }, "-\u20B9", forfeitedRewardResult.forfeitedIfEmi.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] text-ledger-navy/50" }, "EMI earns \u20B90 reward"))), !isCustomCardRate && /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-[11px] text-ledger-navy/50 leading-relaxed" }, selectedCardProfile.notes))), hasRealEmiOption && /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement(
+        "button",
+        {
+          type: "button",
+          onClick: () => setIsEmiMathOpen(!isEmiMathOpen),
+          className: "w-full px-3.5 py-2.5 flex items-center justify-between text-sm font-semibold text-ledger-navy hover:bg-ledger-paper/60 transition-colors"
+        },
+        /* @__PURE__ */ import_react3.default.createElement("span", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement(TriangleAlert, { className: "w-3.5 h-3.5 text-ledger-navy/50" }), "What EMI actually costs", /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-mono tabular-nums text-xs text-ledger-debit" }, mathResult.effectiveAnnualPercentageRate, "% APR")),
+        isEmiMathOpen ? /* @__PURE__ */ import_react3.default.createElement(ChevronUp, { className: "w-4 h-4" }) : /* @__PURE__ */ import_react3.default.createElement(ChevronDown, { className: "w-4 h-4" })
+      ), isEmiMathOpen && /* @__PURE__ */ import_react3.default.createElement("div", { className: "px-3.5 pb-3.5 space-y-4" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "grid grid-cols-3 divide-x divide-ledger-rule border border-ledger-rule" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "p-2.5" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] font-semibold text-ledger-navy/50" }, "Effective APR"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-xl font-bold font-mono tabular-nums text-ledger-debit" }, mathResult.effectiveAnnualPercentageRate, "%"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] text-ledger-navy/50" }, "vs 0% advertised")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "p-2.5" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] font-semibold text-ledger-navy/50" }, "GST + fee drag"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-xl font-bold font-mono tabular-nums text-ledger-navy" }, "\u20B9", mathResult.totalHiddenFriction.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] text-ledger-navy/50" }, "\u20B9", processingFee, " fee + \u20B9", mathResult.totalGstOnInterest.toFixed(2), " GST")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "p-2.5" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] font-semibold text-ledger-navy/50" }, "Monthly outflow"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-xl font-bold font-mono tabular-nums text-ledger-navy" }, "\u20B9", mathResult.monthlyBaseEmi.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-[11px] text-ledger-navy/50" }, "for ", tenure, " months"))), /* @__PURE__ */ import_react3.default.createElement("ul", { className: "space-y-2 text-sm text-ledger-navy/80 leading-relaxed" }, /* @__PURE__ */ import_react3.default.createElement("li", { className: "border-l-2 border-ledger-debit pl-2.5" }, "The merchant's upfront discount offsets the bank's interest, but processing fees and statutory 18% GST turn 0% into ", /* @__PURE__ */ import_react3.default.createElement("strong", { className: "text-ledger-navy" }, mathResult.effectiveAnnualPercentageRate, "% effective APR"), "."), /* @__PURE__ */ import_react3.default.createElement("li", { className: "border-l-2 border-ledger-seal pl-2.5" }, "Every month, GST on the interest component adds up to a guaranteed ", /* @__PURE__ */ import_react3.default.createElement("strong", { className: "text-ledger-navy" }, "\u20B9", mathResult.totalHiddenFriction.toLocaleString("en-IN")), " that you can't get back."), /* @__PURE__ */ import_react3.default.createElement("li", { className: "border-l-2 border-ledger-credit pl-2.5" }, "Paying upfront by UPI or debit card removes that \u20B9", mathResult.totalHiddenFriction.toLocaleString("en-IN"), " drag entirely and keeps your credit limit untouched.")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "border-t border-ledger-rule pt-3 space-y-2" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center justify-between text-sm" }, /* @__PURE__ */ import_react3.default.createElement("label", { htmlFor: "ext-tenure-slider", className: "font-semibold text-ledger-navy flex items-center gap-1.5" }, "Tenure: ", /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-mono tabular-nums font-bold" }, tenure, " months"))), /* @__PURE__ */ import_react3.default.createElement(
         "input",
         {
           id: "ext-tenure-slider",
@@ -7946,99 +8218,69 @@
           step: 1,
           value: sliderIndex,
           onChange: (e) => setSliderIndex(Number(e.target.value)),
-          className: "w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600 focus:outline-none"
+          className: "w-full h-1.5 bg-ledger-rule appearance-none cursor-pointer accent-ledger-navy focus:outline-none"
         }
-      ), /* @__PURE__ */ import_react3.default.createElement(
-        "div",
+      ), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center justify-between" }, TENURE_OPTIONS.map((opt, idx) => /* @__PURE__ */ import_react3.default.createElement(
+        "button",
         {
-          style: {
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            paddingTop: "8px",
-            width: "100%"
-          }
+          key: opt,
+          type: "button",
+          onClick: () => setSliderIndex(idx),
+          className: `px-2 py-1 text-xs font-mono tabular-nums ${sliderIndex === idx ? "text-ledger-navy font-bold" : "text-ledger-navy/40"}`
         },
-        TENURE_OPTIONS.map((opt, idx) => /* @__PURE__ */ import_react3.default.createElement(
+        opt,
+        "m"
+      )))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "border-t border-ledger-rule pt-1" }, /* @__PURE__ */ import_react3.default.createElement(
+        "button",
+        {
+          type: "button",
+          onClick: () => setIsRecoveryOpen(!isRecoveryOpen),
+          className: "w-full py-2 flex items-center justify-between text-xs font-semibold text-ledger-navy/70 hover:text-ledger-navy transition-colors"
+        },
+        /* @__PURE__ */ import_react3.default.createElement("span", { className: "flex items-center gap-1.5" }, /* @__PURE__ */ import_react3.default.createElement(TrendingUp, { className: "w-3.5 h-3.5" }), "What that saved money could grow into"),
+        isRecoveryOpen ? /* @__PURE__ */ import_react3.default.createElement(ChevronUp, { className: "w-3.5 h-3.5" }) : /* @__PURE__ */ import_react3.default.createElement(ChevronDown, { className: "w-3.5 h-3.5" })
+      ), isRecoveryOpen && /* @__PURE__ */ import_react3.default.createElement("div", { className: "space-y-2.5 pb-1" }, /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-xs text-ledger-navy/50" }, "If you invested the \u20B9", recoveryCompounding.savedFriction.toLocaleString("en-IN"), " you saved into a 7.10% sovereign T-Bill instead:"), /* @__PURE__ */ import_react3.default.createElement("div", { className: "grid grid-cols-3 divide-x divide-ledger-rule border border-ledger-rule" }, ["1Y", "3Y", "5Y"].map((h) => {
+        const value = h === "1Y" ? recoveryCompounding.fv1Year : h === "3Y" ? recoveryCompounding.fv3Year : recoveryCompounding.fv5Year;
+        const label = h === "1Y" ? "1 year" : h === "3Y" ? "3 years" : "5 years";
+        const isActive = compoundingHorizon === h;
+        return /* @__PURE__ */ import_react3.default.createElement(
           "button",
           {
-            key: opt,
+            key: h,
             type: "button",
-            onClick: () => setSliderIndex(idx),
-            style: {
-              padding: "4px 8px",
-              borderRadius: "6px",
-              fontSize: "12px",
-              fontFamily: "monospace",
-              cursor: "pointer",
-              border: sliderIndex === idx ? "1px solid #6ee7b7" : "1px solid transparent",
-              backgroundColor: sliderIndex === idx ? "#ecfdf5" : "transparent",
-              color: sliderIndex === idx ? "#047857" : "#64748b",
-              fontWeight: sliderIndex === idx ? "800" : "500",
-              transition: "all 0.15s ease"
-            }
+            onClick: () => setCompoundingHorizon(h),
+            className: `p-2 text-center transition-colors ${isActive ? "bg-ledger-navy text-white" : "bg-white text-ledger-navy hover:bg-ledger-paper"}`
           },
-          opt,
-          "m"
-        ))
-      ))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "p-4 rounded-xl border border-emerald-200 bg-gradient-to-br from-emerald-50/80 via-white to-teal-50/50 shadow-sm space-y-3" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "p-1 rounded-md bg-emerald-600 text-white" }, /* @__PURE__ */ import_react3.default.createElement(TrendingUp, { className: "w-3.5 h-3.5" })), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("h4", { className: "text-xs font-bold text-slate-900 uppercase tracking-wide" }, "Friction Recovery & Compounding Matrix"), /* @__PURE__ */ import_react3.default.createElement("p", { className: "text-[10px] text-slate-500" }, "Preserve leaked bank fees & GST by paying upfront into a ", /* @__PURE__ */ import_react3.default.createElement("strong", null, "7.10% Sovereign T-Bill")))), /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300" }, "RBI Benchmark 7.10%")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "grid grid-cols-3 gap-2 pt-1" }, /* @__PURE__ */ import_react3.default.createElement(
-        "button",
-        {
-          type: "button",
-          onClick: () => setCompoundingHorizon("1Y"),
-          className: `p-2.5 rounded-lg border text-center transition-all cursor-pointer ${compoundingHorizon === "1Y" ? "bg-emerald-900 text-white border-emerald-800 ring-2 ring-emerald-400 shadow-sm scale-[1.02]" : "bg-white hover:bg-emerald-50/50 border-emerald-200 text-slate-900 shadow-2xs"}`
-        },
-        /* @__PURE__ */ import_react3.default.createElement("div", { className: `text-[10px] font-bold uppercase ${compoundingHorizon === "1Y" ? "text-emerald-200" : "text-slate-500"}` }, "1 Year T-Bill"),
-        /* @__PURE__ */ import_react3.default.createElement("div", { className: `text-sm sm:text-base font-black mt-0.5 ${compoundingHorizon === "1Y" ? "text-white" : "text-slate-900"}` }, "\u20B9", recoveryCompounding.fv1Year.toLocaleString("en-IN")),
-        /* @__PURE__ */ import_react3.default.createElement("div", { className: `text-[9px] font-semibold mt-0.5 ${compoundingHorizon === "1Y" ? "text-emerald-300" : "text-emerald-700"}` }, "Preserves \u20B9", recoveryCompounding.savedFriction.toLocaleString("en-IN"))
-      ), /* @__PURE__ */ import_react3.default.createElement(
-        "button",
-        {
-          type: "button",
-          onClick: () => setCompoundingHorizon("3Y"),
-          className: `p-2.5 rounded-lg border text-center transition-all cursor-pointer ${compoundingHorizon === "3Y" ? "bg-emerald-900 text-white border-emerald-800 ring-2 ring-emerald-400 shadow-sm scale-[1.02]" : "bg-white hover:bg-emerald-50/50 border-emerald-200 text-slate-900 shadow-2xs"}`
-        },
-        /* @__PURE__ */ import_react3.default.createElement("div", { className: `text-[10px] font-bold uppercase ${compoundingHorizon === "3Y" ? "text-emerald-200" : "text-slate-500"}` }, "3 Year Compound"),
-        /* @__PURE__ */ import_react3.default.createElement("div", { className: `text-sm sm:text-base font-black mt-0.5 ${compoundingHorizon === "3Y" ? "text-white" : "text-emerald-700"}` }, "\u20B9", recoveryCompounding.fv3Year.toLocaleString("en-IN")),
-        /* @__PURE__ */ import_react3.default.createElement("div", { className: `text-[9px] font-semibold mt-0.5 ${compoundingHorizon === "3Y" ? "text-emerald-300" : "text-emerald-600"}` }, "+\u20B9", (recoveryCompounding.fv3Year - recoveryCompounding.savedFriction).toLocaleString("en-IN"), " yield")
-      ), /* @__PURE__ */ import_react3.default.createElement(
-        "button",
-        {
-          type: "button",
-          onClick: () => setCompoundingHorizon("5Y"),
-          className: `p-2.5 rounded-lg border text-center transition-all cursor-pointer ${compoundingHorizon === "5Y" ? "bg-emerald-900 text-white border-emerald-800 ring-2 ring-emerald-400 shadow-sm scale-[1.02]" : "bg-white hover:bg-emerald-50/50 border-emerald-200 text-slate-900 shadow-2xs"}`
-        },
-        /* @__PURE__ */ import_react3.default.createElement("div", { className: `text-[10px] font-bold uppercase ${compoundingHorizon === "5Y" ? "text-emerald-300" : "text-slate-500"}` }, "5 Year Wealth"),
-        /* @__PURE__ */ import_react3.default.createElement("div", { className: `text-sm sm:text-base font-black mt-0.5 ${compoundingHorizon === "5Y" ? "text-white" : "text-slate-900"}` }, "\u20B9", recoveryCompounding.fv5Year.toLocaleString("en-IN")),
-        /* @__PURE__ */ import_react3.default.createElement("div", { className: `text-[9px] font-semibold mt-0.5 ${compoundingHorizon === "5Y" ? "text-emerald-200" : "text-emerald-700"}` }, "+\u20B9", recoveryCompounding.compoundedGain5Y.toLocaleString("en-IN"), " pure gain")
-      )), /* @__PURE__ */ import_react3.default.createElement("div", { className: "p-2.5 rounded-lg bg-slate-900 text-white text-xs flex items-center justify-between gap-2" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ import_react3.default.createElement(PiggyBank, { className: "w-4 h-4 text-emerald-400 shrink-0" }), /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-[11px] text-slate-200" }, "Invest \u20B9", mathResult.monthlyBaseEmi.toLocaleString("en-IN"), "/mo in Liquid Fund SIP instead:")), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-right shrink-0" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-xs font-black text-emerald-400" }, "\u20B9", recoveryCompounding.sipFv.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("span", { className: "text-[9px] text-slate-400 block font-mono" }, "(+\u20B9", recoveryCompounding.sipGain.toLocaleString("en-IN"), " yield vs -\u20B9", recoveryCompounding.savedFriction, " leak)")))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "border border-slate-200 rounded-xl overflow-hidden bg-white" }, /* @__PURE__ */ import_react3.default.createElement(
+          /* @__PURE__ */ import_react3.default.createElement("div", { className: `text-[11px] ${isActive ? "text-white/60" : "text-ledger-navy/50"}` }, label),
+          /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-base font-bold font-mono tabular-nums" }, "\u20B9", value.toLocaleString("en-IN"))
+        );
+      })), /* @__PURE__ */ import_react3.default.createElement("div", { className: "flex items-center justify-between gap-2 p-2.5 bg-ledger-navy text-white text-xs" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "flex items-center gap-2 text-white/80" }, /* @__PURE__ */ import_react3.default.createElement(PiggyBank, { className: "w-3.5 h-3.5 shrink-0" }), "Invest \u20B9", mathResult.monthlyBaseEmi.toLocaleString("en-IN"), "/mo in a liquid fund instead:"), /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-mono tabular-nums font-bold shrink-0" }, "\u20B9", recoveryCompounding.sipFv.toLocaleString("en-IN"))))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "border-t border-ledger-rule pt-1" }, /* @__PURE__ */ import_react3.default.createElement(
         "button",
         {
           onClick: () => setIsProofOpen(!isProofOpen),
-          className: "w-full px-4 py-2.5 flex items-center justify-between text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+          className: "w-full py-2 flex items-center justify-between text-xs font-semibold text-ledger-navy/70 hover:text-ledger-navy transition-colors"
         },
-        /* @__PURE__ */ import_react3.default.createElement("span", null, "Deterministic Monthly Breakdown (", tenure, " Months)"),
-        isProofOpen ? /* @__PURE__ */ import_react3.default.createElement(ChevronUp, { className: "w-4 h-4" }) : /* @__PURE__ */ import_react3.default.createElement(ChevronDown, { className: "w-4 h-4" })
-      ), isProofOpen && /* @__PURE__ */ import_react3.default.createElement("div", { className: "p-3 border-t border-slate-100 max-h-44 overflow-y-auto" }, /* @__PURE__ */ import_react3.default.createElement("table", { className: "w-full text-[10px] text-left" }, /* @__PURE__ */ import_react3.default.createElement("thead", { className: "bg-slate-50 text-slate-600 font-bold border-b border-slate-200 sticky top-0" }, /* @__PURE__ */ import_react3.default.createElement("tr", null, /* @__PURE__ */ import_react3.default.createElement("th", { className: "py-1.5 px-2" }, "Month"), /* @__PURE__ */ import_react3.default.createElement("th", { className: "py-1.5 px-2" }, "Principal"), /* @__PURE__ */ import_react3.default.createElement("th", { className: "py-1.5 px-2" }, "Interest"), /* @__PURE__ */ import_react3.default.createElement("th", { className: "py-1.5 px-2 text-red-600" }, "18% GST"), /* @__PURE__ */ import_react3.default.createElement("th", { className: "py-1.5 px-2 font-bold" }, "Total"))), /* @__PURE__ */ import_react3.default.createElement("tbody", { className: "divide-y divide-slate-100 text-slate-600 font-mono" }, mathResult.schedule.map((row) => /* @__PURE__ */ import_react3.default.createElement("tr", { key: row.month }, /* @__PURE__ */ import_react3.default.createElement("td", { className: "py-1 px-2 font-bold" }, row.month), /* @__PURE__ */ import_react3.default.createElement("td", { className: "py-1 px-2" }, "\u20B9", row.principalComponent.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("td", { className: "py-1 px-2" }, "\u20B9", row.interestComponent.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("td", { className: "py-1 px-2 text-red-600" }, "\u20B9", row.gstOnInterest.toFixed(2)), /* @__PURE__ */ import_react3.default.createElement("td", { className: "py-1 px-2 font-bold text-slate-900" }, "\u20B9", row.totalMonthlyCashflow.toLocaleString("en-IN"))))))))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "pt-3 border-t border-slate-100 flex items-center justify-between gap-3" }, /* @__PURE__ */ import_react3.default.createElement(
+        /* @__PURE__ */ import_react3.default.createElement("span", null, "Full monthly breakdown (", tenure, " months)"),
+        isProofOpen ? /* @__PURE__ */ import_react3.default.createElement(ChevronUp, { className: "w-3.5 h-3.5" }) : /* @__PURE__ */ import_react3.default.createElement(ChevronDown, { className: "w-3.5 h-3.5" })
+      ), isProofOpen && /* @__PURE__ */ import_react3.default.createElement("div", { className: "max-h-44 overflow-y-auto border border-ledger-rule" }, /* @__PURE__ */ import_react3.default.createElement("table", { className: "w-full text-[11px] text-left font-mono tabular-nums" }, /* @__PURE__ */ import_react3.default.createElement("thead", { className: "bg-ledger-paper text-ledger-navy/60 font-bold sticky top-0" }, /* @__PURE__ */ import_react3.default.createElement("tr", null, /* @__PURE__ */ import_react3.default.createElement("th", { className: "py-1.5 px-2 font-semibold" }, "Month"), /* @__PURE__ */ import_react3.default.createElement("th", { className: "py-1.5 px-2 font-semibold" }, "Principal"), /* @__PURE__ */ import_react3.default.createElement("th", { className: "py-1.5 px-2 font-semibold" }, "Interest"), /* @__PURE__ */ import_react3.default.createElement("th", { className: "py-1.5 px-2 font-semibold text-ledger-debit" }, "GST"), /* @__PURE__ */ import_react3.default.createElement("th", { className: "py-1.5 px-2 font-semibold" }, "Total"))), /* @__PURE__ */ import_react3.default.createElement("tbody", { className: "divide-y divide-ledger-rule text-ledger-navy/70" }, mathResult.schedule.map((row) => /* @__PURE__ */ import_react3.default.createElement("tr", { key: row.month }, /* @__PURE__ */ import_react3.default.createElement("td", { className: "py-1 px-2 font-bold" }, row.month), /* @__PURE__ */ import_react3.default.createElement("td", { className: "py-1 px-2" }, "\u20B9", row.principalComponent.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("td", { className: "py-1 px-2" }, "\u20B9", row.interestComponent.toLocaleString("en-IN")), /* @__PURE__ */ import_react3.default.createElement("td", { className: "py-1 px-2 text-ledger-debit" }, "\u20B9", row.gstOnInterest.toFixed(2)), /* @__PURE__ */ import_react3.default.createElement("td", { className: "py-1 px-2 font-bold text-ledger-navy" }, "\u20B9", row.totalMonthlyCashflow.toLocaleString("en-IN"))))))))))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "text-sm text-ledger-navy/80 leading-relaxed border-l-2 border-ledger-seal pl-3" }, /* @__PURE__ */ import_react3.default.createElement("span", { className: "font-bold text-ledger-navy" }, "Why we're flagging this. "), surfaceType === "TRAVEL" ? /* @__PURE__ */ import_react3.default.createElement(import_react3.default.Fragment, null, "Travel Now, Pay Later advertises low monthly amounts but charges 24\u201336% penalty APR if you miss a payment after your trip. A 6-month liquid fund SIP at 7.10% gets you there debt-free instead.") : surfaceType === "EDTECH" ? /* @__PURE__ */ import_react3.default.createElement(import_react3.default.Fragment, null, '"0% subvention" loan packages often bake a 3\u20135% surcharge into the course price itself. Paying by direct transfer usually earns a comparable cash rebate.') : surfaceType === "UDEMY" ? /* @__PURE__ */ import_react3.default.createElement(import_react3.default.Fragment, null, "Udemy's countdown timer resets every browser session \u2014 it isn't really running out. Over 87% of self-paced courses bought on impulse are never finished. Pay by UPI or hold the money in a liquid fund until you've scheduled time to actually study.") : surfaceType === "AMAZON" ? /* @__PURE__ */ import_react3.default.createElement(import_react3.default.Fragment, null, "Paying in full with an Amazon Pay ICICI card locks a real 5% cashback. Choosing No-Cost EMI instead costs you roughly \u20B9", mathResult.totalHiddenFriction.toLocaleString("en-IN"), " in non-refundable GST and fees.") : /* @__PURE__ */ import_react3.default.createElement(import_react3.default.Fragment, null, "Paying in full with a Flipkart Axis card locks a real 5% cashback. Choosing No-Cost EMI instead costs you roughly \u20B9", mathResult.totalHiddenFriction.toLocaleString("en-IN"), " in non-refundable GST and fees.")))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "bg-white px-6 py-3.5 border-t border-ledger-rule flex items-center justify-between gap-3" }, /* @__PURE__ */ import_react3.default.createElement(
         "button",
         {
           id: "btn-cancel-stay",
           onClick: onCancelStayOnPage,
-          className: "w-1/2 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-bold transition-colors flex items-center justify-center gap-1.5 border border-slate-300 shadow-sm"
+          className: "w-1/2 py-2.5 px-4 border border-ledger-rule text-ledger-navy text-sm sm:text-base font-semibold hover:bg-ledger-paper transition-colors flex items-center justify-center gap-1.5"
         },
-        /* @__PURE__ */ import_react3.default.createElement(RotateCcw, { className: "w-3.5 h-3.5 text-slate-600" }),
-        /* @__PURE__ */ import_react3.default.createElement("span", null, "Cancel & Modify Terms")
+        /* @__PURE__ */ import_react3.default.createElement(RotateCcw, { className: "w-3.5 h-3.5" }),
+        "Cancel and change terms"
       ), /* @__PURE__ */ import_react3.default.createElement(
         "button",
         {
           id: "btn-close-proceed",
           onClick: onProceedAndContinue,
-          className: "w-1/2 py-3 px-4 rounded-xl bg-slate-900 hover:bg-black text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-1.5"
+          className: "w-1/2 py-2.5 px-4 bg-ledger-navy text-white text-sm sm:text-base font-semibold hover:bg-ledger-navy/90 transition-colors flex items-center justify-center gap-1.5"
         },
-        /* @__PURE__ */ import_react3.default.createElement("span", null, "I Understand, Proceed"),
+        "Continue",
         /* @__PURE__ */ import_react3.default.createElement(ArrowRight, { className: "w-4 h-4" })
-      ))))
+      )))
     );
   };
 
@@ -8080,6 +8322,20 @@
       const cleanDigits = text.replace(/[^0-9.]/g, "");
       const fallbackVal = parseFloat(cleanDigits);
       return isNaN(fallbackVal) ? 0 : Math.round(fallbackVal);
+    }
+    function buildGstItcOffer(id, price, gstRatePercent, invoiceLabel) {
+      if (price < 5e3) return null;
+      const itcAmount = Math.round(price * (gstRatePercent / 100));
+      return {
+        id,
+        bankOrCard: `Freelancer/Business Tip: ${invoiceLabel}`,
+        description: `Claim ${gstRatePercent}% GST Input Tax Credit (ITC) if this is a business purchase`,
+        effectiveBenefit: `Reclaim up to \u20B9${itcAmount.toLocaleString("en-IN")} via ITC`,
+        rating: "GOOD",
+        reason: `Registered GSTIN businesses/freelancers can offset \u20B9${itcAmount.toLocaleString("en-IN")} of output tax liability under Section 16 of the CGST Act \u2014 but only if a GST invoice is requested BEFORE payment completes; a B2C invoice cannot be converted afterward.`,
+        netPrice: price - itcAmount,
+        recommended: false
+      };
     }
     function extractProductInfo(clickedEl) {
       let detectedPrice = 0;
@@ -8264,11 +8520,24 @@
             }
           }
         }
-        if (!detectedBankName && !isExplicitUpi && !isExplicitTnpl) {
+        if (!detectedBankName && !isExplicitUpi && !isExplicitTnpl && !isExplicitNoCost) {
           const activeEls = document.querySelectorAll('input[type="radio"]:checked, [aria-checked="true"], [class*="selected"], [class*="active"]');
           for (const el of Array.from(activeEls)) {
             const parentRow = el.closest("li, label, tr, div") || el;
-            const cleaned = cleanBankText2(parentRow.textContent || "");
+            const rawActiveText = (parentRow.textContent || "").trim();
+            if (/scan\s*to\s*pay|qr|upi|google\s*pay|phonepe|paytm/i.test(rawActiveText) && rawActiveText.length < 100) {
+              isExplicitUpi = true;
+              break;
+            }
+            if (/tnpl|travel\s*now\s*pay\s*later|trip\s*money/i.test(rawActiveText) && rawActiveText.length < 100) {
+              isExplicitTnpl = true;
+              break;
+            }
+            if (/no\s*cost\s*emi/i.test(rawActiveText) && rawActiveText.length < 100 && !/bank|card/i.test(rawActiveText)) {
+              isExplicitNoCost = true;
+              break;
+            }
+            const cleaned = cleanBankText2(rawActiveText);
             if (cleaned && cleaned.length >= 2 && cleaned.length <= 45 && !isGenericNoise2(cleaned)) {
               detectedBankName = cleaned;
               break;
@@ -8336,7 +8605,7 @@
         const gstOnInterest = Math.round(statedInterestAmount * 0.18);
         const bankProcessingFeeTotal = Math.round(199 * 1.18);
         const realTrueOutflow = statedTotalPayable + gstOnInterest + bankProcessingFeeTotal;
-        const isBankSelected = !isExplicitUpi && !isExplicitTnpl && !isExplicitNoCost;
+        const isBankSelected = !isExplicitUpi && !isExplicitTnpl && !isExplicitNoCost && !!detectedBankName;
         const travelOffers = [
           {
             id: "bank-emi-scraped",
@@ -8394,6 +8663,9 @@
             isSelected: isExplicitTnpl
           }
         ];
+        const travelGstRate = /hotel|stay|check-in|check-out/i.test(bodyText) ? 15 : /business\s*class/i.test(bodyText) ? 12 : 5;
+        const travelGstItcOffer = buildGstItcOffer("travel-gst-itc", travelPrice, travelGstRate, "Business Travel GST Invoice");
+        if (travelGstItcOffer) travelOffers.push(travelGstItcOffer);
         return {
           surfaceType: "TRAVEL",
           price: travelPrice,
@@ -8405,6 +8677,16 @@
         };
       }
       if (CURRENT_SURFACE === "UDEMY") {
+        let classifyUdemyPaymentText2 = function(t) {
+          const s = (t || "").toLowerCase();
+          if (!s) return "";
+          if (/\bupi\b/.test(s)) return "UPI";
+          if (/net\s*banking/.test(s)) return "Net Banking";
+          if (/mobile\s*wallet|\bwallet\b/.test(s)) return "Mobile Wallet";
+          if (/\bcard\b/.test(s)) return "Cards";
+          return "";
+        };
+        var classifyUdemyPaymentText = classifyUdemyPaymentText2;
         const pathname = window.location.pathname;
         const isUdemyCart = pathname.includes("/cart") || pathname.includes("/checkout");
         const courseSlugMatch = pathname.match(/\/course\/([^\/\?#]+)/);
@@ -8575,7 +8857,7 @@
         }
         if (!detectedPrice) {
           const udemyRegexPatterns = [
-            /(?:Total|Order\s*Total|Total\s*Amount)[^\d₹$€£]*[₹$€£]\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
+            /\b(?:Order\s*Total|Total\s*Amount|Total)\b(?:\s*\([^)]*\))?[^₹$€£]{0,24}[₹$€£]\s*([0-9,]+(?:\.[0-9]{1,2})?)/i,
             /(?:Current\s*price)[^\d₹$€£]*[₹$€£]\s*([0-9,]+(?:\.[0-9]{1,2})?)/i
           ];
           for (const pat of udemyRegexPatterns) {
@@ -8610,16 +8892,34 @@
         const udemyPrice = detectedPrice;
         const udemyOrigPrice = detectedOriginalPrice > 0 ? detectedOriginalPrice : 0;
         const discountPct = detectedDiscount > 0 ? detectedDiscount : udemyOrigPrice > udemyPrice && udemyOrigPrice > 0 ? Math.round((udemyOrigPrice - udemyPrice) / udemyOrigPrice * 100) : 0;
+        let detectedUdemyChannel = "";
+        if (clickedEl) {
+          const row = clickedEl.closest('li, label, div, [role="radio"]') || clickedEl;
+          detectedUdemyChannel = classifyUdemyPaymentText2((row.textContent || "").trim());
+        }
+        if (!detectedUdemyChannel) {
+          const checkedPaymentEls = document.querySelectorAll('input[type="radio"]:checked, [aria-checked="true"]');
+          for (const el of Array.from(checkedPaymentEls)) {
+            const row = el.closest("li, label, div") || el;
+            const cat = classifyUdemyPaymentText2((row.textContent || "").trim());
+            if (cat) {
+              detectedUdemyChannel = cat;
+              break;
+            }
+          }
+        }
+        const udemyChannelLabel = detectedUdemyChannel || "UPI / Debit Card";
         const udemyOffers = [
           {
             id: "upi-udemy",
-            bankOrCard: "UPI / Debit Card (Immediate Full Pay)",
+            bankOrCard: `${udemyChannelLabel} (Immediate Full Pay)`,
             description: "Single payment without BNPL or EMI installment debt",
             effectiveBenefit: "Zero interest, zero processing friction",
             rating: "BEST",
             reason: "Never finance small educational purchases under \u20B92,000 with consumer credit.",
             netPrice: udemyPrice,
-            recommended: true
+            recommended: true,
+            isSelected: !!detectedUdemyChannel
           },
           {
             id: "t-bill-delay",
@@ -8642,6 +8942,8 @@
             recommended: false
           }
         ];
+        const udemyGstItcOffer = buildGstItcOffer("udemy-gst-itc", udemyPrice, 18, "Udemy Business GST Invoice");
+        if (udemyGstItcOffer) udemyOffers.push(udemyGstItcOffer);
         return {
           surfaceType: "UDEMY",
           price: udemyPrice,
@@ -8655,6 +8957,16 @@
         };
       }
       if (CURRENT_SURFACE === "AMAZON") {
+        let classifyAmazonPaymentText2 = function(text) {
+          const t = (text || "").toLowerCase();
+          if (!t) return "";
+          if (/\bemi\b/.test(t)) return "EMI";
+          if (/\bupi\b|amazon\s*pay\s*balance/.test(t)) return "UPI";
+          if (/icici/.test(t)) return "ICICI_CARD";
+          if (/credit\s*or\s*debit\s*card|\bcard\b/.test(t)) return "CARD";
+          return "";
+        };
+        var classifyAmazonPaymentText = classifyAmazonPaymentText2;
         const isAmazonCartPage = window.location.href.includes("/cart") || window.location.href.includes("/gp/cart") || window.location.href.includes("/buy/") || document.querySelector("#sc-active-cart, #gutterCartViewForm, #activeCartViewForm") !== null;
         if (clickedEl) {
           const candidateTexts = [
@@ -8849,6 +9161,22 @@
         }
         if (!detectedName) detectedName = "Identified Amazon Product";
         const amazonFinalPrice = detectedPrice;
+        let detectedPaymentCategory = "";
+        if (clickedEl) {
+          const rowEl = clickedEl.closest('li, label, tr, [role="radio"], [class*="payment"], [class*="pmts"]') || clickedEl;
+          detectedPaymentCategory = classifyAmazonPaymentText2(rowEl.textContent || "");
+        }
+        if (!detectedPaymentCategory) {
+          const checkedEls = document.querySelectorAll('input[type="radio"]:checked, [aria-checked="true"]');
+          for (const el of Array.from(checkedEls)) {
+            const rowEl = el.closest("li, label, tr, div") || el;
+            const cat = classifyAmazonPaymentText2(rowEl.textContent || "");
+            if (cat) {
+              detectedPaymentCategory = cat;
+              break;
+            }
+          }
+        }
         const amazonOffers = [];
         amazonOffers.push({
           id: "amazon-upi-instant",
@@ -8858,7 +9186,8 @@
           rating: "BEST",
           reason: "Zero interest, zero processing fee, keeps credit limit 100% free.",
           netPrice: amazonFinalPrice,
-          recommended: true
+          recommended: true,
+          isSelected: detectedPaymentCategory === "UPI"
         });
         const cashbackMatch = bodyText.match(/Upto\s*₹\s*([0-9,]+(?:\.[0-9]{1,2})?)\s*cashback\s*as\s*Amazon\s*Pay/i);
         let iciciCashback = Math.round(amazonFinalPrice * 0.05);
@@ -8874,7 +9203,8 @@
           rating: "BEST",
           reason: `Earns \u20B9${iciciCashback.toLocaleString("en-IN")} unconditional Amazon Pay balance without any tenure lock-in.`,
           netPrice: amazonFinalPrice - iciciCashback,
-          recommended: true
+          recommended: true,
+          isSelected: detectedPaymentCategory === "ICICI_CARD"
         });
         const bankOfferMatch = bodyText.match(/Upto\s*₹\s*([0-9,]+(?:\.[0-9]{1,2})?)\s*discount\s*on\s*Credit\s*Cards/i);
         let bankDiscount = Math.min(Math.round(amazonFinalPrice * 0.1), 1e3);
@@ -8890,7 +9220,8 @@
           rating: "GOOD",
           reason: "Direct instant price reduction at checkout if paid in full single tranche.",
           netPrice: amazonFinalPrice - bankDiscount,
-          recommended: false
+          recommended: false,
+          isSelected: detectedPaymentCategory === "CARD"
         });
         const emiMonths = 12;
         const estimatedGstFee = Math.round(199 + amazonFinalPrice * 0.15 * (emiMonths / 12) * 0.18);
@@ -8904,21 +9235,11 @@
           rating: "AVOID",
           reason: `Hidden administrative leak: charges \u20B9199 bank fee + \u20B9${estimatedGstFee} non-refundable GST on monthly interest.`,
           netPrice: amazonFinalPrice + estimatedGstFee,
-          recommended: false
+          recommended: false,
+          isSelected: detectedPaymentCategory === "EMI"
         });
-        if (/GST\s*invoice|business\s*purchase/i.test(bodyText)) {
-          const gstInputCredit = Math.round(amazonFinalPrice * 0.18);
-          amazonOffers.push({
-            id: "amazon-gst-itc",
-            bankOrCard: "Partner Offer: Amazon Business GST Invoice",
-            description: "Claim Input Tax Credit (ITC) for business purchases",
-            effectiveBenefit: `Save up to \u20B9${gstInputCredit.toLocaleString("en-IN")} (18% GST ITC)`,
-            rating: "GOOD",
-            reason: "Valid for registered GSTIN businesses to offset output tax liability.",
-            netPrice: amazonFinalPrice - gstInputCredit,
-            recommended: false
-          });
-        }
+        const amazonGstItcOffer = buildGstItcOffer("amazon-gst-itc", amazonFinalPrice, 18, "Amazon Business GST Invoice");
+        if (amazonGstItcOffer) amazonOffers.push(amazonGstItcOffer);
         return {
           surfaceType: "AMAZON",
           price: amazonFinalPrice,
@@ -9039,16 +9360,32 @@
         }
       }
       const flipkartPrice = detectedPrice;
+      function classifyFlipkartPaymentText(t) {
+        if (/icici/i.test(t)) return "ICICI Bank Credit Card (No Cost EMI)";
+        if (/bajaj/i.test(t)) return "Bajaj Finance (No Cost EMI)";
+        if (/bobcard|bob/i.test(t)) return "BOBCARD Credit Card";
+        if (/kotak/i.test(t)) return "Kotak Mahindra Bank Credit Card";
+        if (/axis/i.test(t)) return "Flipkart Axis Bank Credit Card";
+        if (/upi|qr\s*code|google\s*pay|phonepe/i.test(t)) return "UPI";
+        return "";
+      }
       let clickedFlipkartCard = "";
       if (clickedEl) {
         const row = clickedEl.closest("li, label, div, button, tr") || clickedEl;
-        const t = (row.textContent || "").trim();
-        if (/icici/i.test(t)) clickedFlipkartCard = "ICICI Bank Credit Card (No Cost EMI)";
-        else if (/bajaj/i.test(t)) clickedFlipkartCard = "Bajaj Finance (No Cost EMI)";
-        else if (/bobcard|bob/i.test(t)) clickedFlipkartCard = "BOBCARD Credit Card";
-        else if (/kotak/i.test(t)) clickedFlipkartCard = "Kotak Mahindra Bank Credit Card";
-        else if (/axis/i.test(t)) clickedFlipkartCard = "Flipkart Axis Bank Credit Card";
-        else if (/upi|qr|google\s*pay|phonepe/i.test(t)) clickedFlipkartCard = "UPI";
+        clickedFlipkartCard = classifyFlipkartPaymentText((row.textContent || "").trim());
+      }
+      if (!clickedFlipkartCard) {
+        const activePaymentEls = document.querySelectorAll(
+          'input[type="radio"]:checked, [aria-checked="true"], [class*="tab"][class*="active"], [class*="tab"][class*="selected"]'
+        );
+        for (const el of Array.from(activePaymentEls)) {
+          const row = el.closest("li, label, div, tr") || el;
+          const cat = classifyFlipkartPaymentText((row.textContent || "").trim());
+          if (cat) {
+            clickedFlipkartCard = cat;
+            break;
+          }
+        }
       }
       const flipkartOffers = [];
       const hasAuBank = /AU Small Finance|AU Bank|AU Credit Card/i.test(bodyText);
@@ -9063,7 +9400,7 @@
         reason: "Zero interest, zero processing fee, keeps credit limit 100% free.",
         netPrice: flipkartPrice,
         recommended: true,
-        isSelected: clickedFlipkartCard === "UPI" || !clickedFlipkartCard && true
+        isSelected: clickedFlipkartCard === "UPI"
       });
       const axisCashback = Math.round(flipkartPrice * 0.05);
       flipkartOffers.push({
@@ -9151,6 +9488,8 @@
           }
         });
       }
+      const flipkartGstItcOffer = buildGstItcOffer("flipkart-gst-itc", flipkartPrice, 18, "Flipkart Business GST Invoice");
+      if (flipkartGstItcOffer) flipkartOffers.push(flipkartGstItcOffer);
       return {
         surfaceType: "FLIPKART",
         price: flipkartPrice,
@@ -9199,8 +9538,8 @@
         padding: 1rem; background-color: rgba(15, 23, 42, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       }
       .commitguard-card {
-        position: relative; width: 100%; max-width: 48rem; background-color: #ffffff; border-radius: 1rem;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); border: 1px solid #e2e8f0; overflow: hidden;
+        position: relative; width: 100%; max-width: 58rem; background-color: #F5F1E6; border-radius: 0.375rem;
+        box-shadow: 0 25px 50px -12px rgba(11, 29, 58, 0.45); border: 1px solid #0B1D3A; overflow: hidden;
       }
     `;
       shadowRoot.appendChild(inlineStyle);
@@ -9261,7 +9600,7 @@
       } catch {
       }
     }
-    const UNIVERSAL_INTERCEPT_KEYWORDS = [
+    const FINAL_COMMIT_KEYWORDS = [
       // 1. E-Commerce (Flipkart, Amazon)
       "continue with emi",
       "buy with emi",
@@ -9271,7 +9610,6 @@
       "place your order",
       "proceed to pay",
       "proceed to retail checkout",
-      "credit card emi",
       "complete payment",
       "buy now",
       // 2. Travel & Flight/Hotel Checkouts (MakeMyTrip, Cleartrip, Yatra, Goibibo)
@@ -9281,28 +9619,14 @@
       "book now pay later",
       "book now, pay later",
       "pay with trip money",
-      "pay in emi",
-      "easy emi",
       "continue to payment",
-      "book flight",
       "pay & book now",
-      "select your bank",
-      "select tenure",
-      "months x",
-      "total payable",
-      "scan to pay",
-      "cardless emi",
-      "no cost emi",
+      "use this payment method",
       // 3. Ed-Tech & Udemy (UpGrad, Scaler, Simplilearn, Udemy)
       "education loan",
       "apply for education loan",
       "pay with loan",
-      "pay in installments",
-      "0% interest emi",
-      "no cost emi options",
-      "enroll with emi",
       "apply for loan",
-      "finance options",
       "complete checkout",
       "enroll now",
       "buy this course",
@@ -9315,43 +9639,45 @@
         if (curr.getAttribute("data-commitguard-authorized") === "true") {
           return null;
         }
-        const text = (curr.innerText || curr.textContent || "").trim().toLowerCase();
         const tagName = curr.tagName.toUpperCase();
+        const isSelectionControl = tagName === "LABEL" || tagName === "INPUT" && /^(radio|checkbox)$/.test((curr.type || "").toLowerCase());
+        if (isSelectionControl) {
+          curr = curr.parentElement;
+          depth++;
+          continue;
+        }
+        const text = (curr.innerText || curr.textContent || "").trim().toLowerCase();
         if (/learn\s*more|emi\s*available|view\s*details|show\s*details|see\s*options|how\s*it\s*works|terms\s*&\s*conditions|terms\s*apply|accordion/i.test(text) && !/proceed|place\s*order|pay\s*now|buy\s*now|continue/i.test(text)) {
           return null;
         }
         if (text.includes("emi available") || text.includes("your order qualifies for emi")) {
           return null;
         }
-        for (const keyword of UNIVERSAL_INTERCEPT_KEYWORDS) {
+        for (const keyword of FINAL_COMMIT_KEYWORDS) {
           if (text === keyword || text.length < 70 && text.includes(keyword)) {
             return curr;
           }
         }
-        if (/(\bemi\b|\bloan\b|\btnpl\b|pay\s*later|installment|subvention|place\s*order|proceed\s*to\s*pay|months\s*x|total\s*payable|no\s*cost\s*emi|kotak|bajaj|hdfc|icici|axis|idfc|scan\s*to\s*pay)/i.test(text) && (tagName === "BUTTON" || tagName === "A" || tagName === "LABEL" || tagName === "LI" || curr.getAttribute("role") === "button" || curr.getAttribute("role") === "radio" || curr.getAttribute("role") === "tab" || curr.classList.toString().includes("btn") || curr.classList.toString().includes("option") || curr.classList.toString().includes("item") || curr.classList.toString().includes("bank") || curr.classList.toString().includes("tenure"))) {
-          if (/available|learn\s*more|faq|policy/i.test(text)) {
-            return null;
-          }
+        if (/(place\s*order|proceed\s*to\s*pay|proceed\s*to\s*buy|pay\s*₹|payment\s*of\s*₹|complete\s*payment|complete\s*checkout)/i.test(text) && (tagName === "BUTTON" || tagName === "A" || curr.getAttribute("role") === "button" || curr.classList.toString().includes("btn"))) {
           return curr;
         }
         if (tagName === "INPUT") {
           const inputType = (curr.type || "").toLowerCase();
           const inputVal = (curr.value || "").toLowerCase();
-          const inputName = (curr.name || "").toLowerCase();
-          if (inputType === "radio" || inputType === "submit" || inputType === "button") {
-            for (const keyword of UNIVERSAL_INTERCEPT_KEYWORDS) {
-              if (inputVal.includes(keyword) || inputName.includes(keyword) || text.includes(keyword)) {
+          if (inputType === "submit" || inputType === "button") {
+            for (const keyword of FINAL_COMMIT_KEYWORDS) {
+              if (inputVal.includes(keyword) || text.includes(keyword)) {
                 return curr;
               }
             }
-            if (/emi|bank|tenure|pay/i.test(inputName) || /emi|bank|tenure|pay/i.test(inputVal)) {
+            if (/pay|place\s*order|proceed/i.test(inputVal)) {
               return curr;
             }
           }
         }
         const idStr = (curr.id || "").toLowerCase();
         const classStr = (curr.className || "").toString().toLowerCase();
-        if (idStr.includes("placeorder") || idStr.includes("proceedtopay") || idStr.includes("emipayment") || idStr.includes("selectbank") || idStr.includes("selecttenure") || classStr.includes("paylater") || classStr.includes("emiselection") || classStr.includes("bankitem") || classStr.includes("tenureitem")) {
+        if (idStr.includes("placeorder") || idStr.includes("proceedtopay") || idStr.includes("emipayment") || classStr.includes("paylater")) {
           return curr;
         }
         curr = curr.parentElement;
@@ -9516,24 +9842,18 @@ lucide-react/dist/esm/defaultAttributes.js:
 lucide-react/dist/esm/Icon.js:
 lucide-react/dist/esm/createLucideIcon.js:
 lucide-react/dist/esm/icons/arrow-right.js:
-lucide-react/dist/esm/icons/book-open.js:
 lucide-react/dist/esm/icons/chevron-down.js:
 lucide-react/dist/esm/icons/chevron-up.js:
 lucide-react/dist/esm/icons/credit-card.js:
-lucide-react/dist/esm/icons/graduation-cap.js:
 lucide-react/dist/esm/icons/piggy-bank.js:
-lucide-react/dist/esm/icons/plane.js:
 lucide-react/dist/esm/icons/rotate-ccw.js:
+lucide-react/dist/esm/icons/search.js:
 lucide-react/dist/esm/icons/shield-check.js:
-lucide-react/dist/esm/icons/shopping-bag.js:
 lucide-react/dist/esm/icons/sliders-vertical.js:
-lucide-react/dist/esm/icons/sparkles.js:
-lucide-react/dist/esm/icons/thumbs-down.js:
-lucide-react/dist/esm/icons/thumbs-up.js:
 lucide-react/dist/esm/icons/trending-up.js:
 lucide-react/dist/esm/icons/triangle-alert.js:
+lucide-react/dist/esm/icons/wallet.js:
 lucide-react/dist/esm/icons/x.js:
-lucide-react/dist/esm/icons/zap.js:
 lucide-react/dist/esm/lucide-react.js:
   (**
    * @license lucide-react v0.475.0 - ISC

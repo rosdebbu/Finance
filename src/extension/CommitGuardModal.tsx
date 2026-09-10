@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   AlertTriangle,
   X,
@@ -6,26 +6,16 @@ import {
   ChevronDown,
   ChevronUp,
   ShieldCheck,
-  Zap,
   ArrowRight,
   RotateCcw,
   CreditCard,
-  CheckCircle2,
-  ThumbsUp,
-  ThumbsDown,
-  Sparkles,
-  Percent,
   TrendingUp,
   PiggyBank,
-  Landmark,
-  Plane,
-  GraduationCap,
-  Scale,
-  BookOpen,
-  ShoppingBag,
-  Edit3,
+  Search,
+  Wallet,
 } from 'lucide-react';
-import { calculateNoCostEmiDrag, evaluateMultiCartEmiRisk } from '../lib/financial-engine';
+import { calculateNoCostEmiDrag, evaluateMultiCartEmiRisk, calculateCreditUtilizationImpact, calculateForfeitedCardReward } from '../lib/financial-engine';
+import { CARD_REWARD_PROFILES, findCardRewardProfile, getCardRewardRate, type SpendCategory } from '../lib/card-rewards';
 
 export type InterceptorSurface = 'AMAZON' | 'FLIPKART' | 'ECOMMERCE' | 'TRAVEL' | 'EDTECH' | 'UDEMY';
 
@@ -55,6 +45,16 @@ export interface ExtensionModalProps {
   onCancelStayOnPage: () => void;   // Closes modal and keeps user on CURRENT page
 }
 
+// Small "what is this purchase" tag per surface — plain nouns, not a tagline.
+const SURFACE_LABEL: Record<InterceptorSurface, string> = {
+  AMAZON: 'Amazon order',
+  FLIPKART: 'Flipkart order',
+  ECOMMERCE: 'Online order',
+  TRAVEL: 'Trip booking',
+  EDTECH: 'Course enrollment',
+  UDEMY: 'Course purchase',
+};
+
 export const ExtensionCommitGuardModal: React.FC<ExtensionModalProps> = ({
   surfaceType = 'AMAZON',
   productPrice = 5399,
@@ -74,16 +74,74 @@ export const ExtensionCommitGuardModal: React.FC<ExtensionModalProps> = ({
   const [sliderIndex, setSliderIndex] = useState<number>(3); // Default to 12 months (index 3)
   const tenure = TENURE_OPTIONS[sliderIndex];
 
-  // Active view tab: 'CARD_OFFERS' vs 'EMI_FRICTION' vs 'RECOVERY_COMPOUNDING'
-  const [activeTab, setActiveTab] = useState<'CARD_OFFERS' | 'EMI_FRICTION' | 'RECOVERY_COMPOUNDING'>('CARD_OFFERS');
   const [showAllMethods, setShowAllMethods] = useState<boolean>(false);
   const [selectedOfferId, setSelectedOfferId] = useState<string | null>(null);
   const [compoundingHorizon, setCompoundingHorizon] = useState<'1Y' | '3Y' | '5Y'>('5Y');
   const [isProofOpen, setIsProofOpen] = useState(false);
+  const [isRecoveryOpen, setIsRecoveryOpen] = useState(false);
+  const [isEmiMathOpen, setIsEmiMathOpen] = useState(false);
+  const [isCurOpen, setIsCurOpen] = useState(false);
+  const [isCardRewardOpen, setIsCardRewardOpen] = useState(false);
 
   // Dynamic Tenure Simulator for active scraped payment option
   const [customTenure, setCustomTenure] = useState<number>(12);
   const [simulatedTenureOffer, setSimulatedTenureOffer] = useState<ScrapedOffer | null>(null);
+
+  // Pre-Checkout CIBIL / Credit Utilization Ratio (CUR) Simulator
+  const CREDIT_LIMIT_PRESETS = [50000, 100000, 200000];
+  const [creditLimitInput, setCreditLimitInput] = useState<number>(100000);
+  const [existingCardBalanceInput, setExistingCardBalanceInput] = useState<number>(0);
+  const [isCustomLimit, setIsCustomLimit] = useState<boolean>(false);
+
+  // Dual-Ledger Card Reward Profile — remembered across checkouts via chrome.storage.sync
+  // so the user only ever picks their card once, not on every single purchase.
+  const QUICK_CARD_IDS = ['amazon-pay-icici', 'flipkart-axis', 'hdfc-millennia', 'sbi-cashback', 'hdfc-infinia'];
+  const [selectedCardId, setSelectedCardId] = useState<string>('amazon-pay-icici');
+  const [isCustomCardRate, setIsCustomCardRate] = useState<boolean>(false);
+  const [customCardRatePercent, setCustomCardRatePercent] = useState<number>(2);
+  const [showFullCardList, setShowFullCardList] = useState<boolean>(false);
+  const [cardSearchQuery, setCardSearchQuery] = useState<string>('');
+
+  useEffect(() => {
+    try {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
+        chrome.storage.sync.get(
+          ['commitguard_selected_card_id', 'commitguard_custom_card_rate'],
+          (items) => {
+            if (!items) return;
+            if (items.commitguard_selected_card_id === 'custom') {
+              setIsCustomCardRate(true);
+              if (typeof items.commitguard_custom_card_rate === 'number') {
+                setCustomCardRatePercent(items.commitguard_custom_card_rate);
+              }
+            } else if (typeof items.commitguard_selected_card_id === 'string' && findCardRewardProfile(items.commitguard_selected_card_id)) {
+              setSelectedCardId(items.commitguard_selected_card_id);
+            }
+          }
+        );
+      }
+    } catch (_) {
+      // Standalone/preview context without chrome.storage — keep sensible defaults
+    }
+  }, []);
+
+  const persistCardChoice = (cardId: string, customRate?: number) => {
+    if (cardId === 'custom') {
+      setIsCustomCardRate(true);
+      if (typeof customRate === 'number') setCustomCardRatePercent(customRate);
+    } else {
+      setIsCustomCardRate(false);
+      setSelectedCardId(cardId);
+    }
+    try {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.sync) {
+        chrome.storage.sync.set({
+          commitguard_selected_card_id: cardId,
+          ...(typeof customRate === 'number' ? { commitguard_custom_card_rate: customRate } : {}),
+        });
+      }
+    } catch (_) {}
+  };
 
   const processingFee = 199;
   const nominalRate = 15.0;
@@ -160,7 +218,7 @@ export const ExtensionCommitGuardModal: React.FC<ExtensionModalProps> = ({
   const recoveryCompounding = useMemo(() => {
     const savedFriction = mathResult.totalHiddenFriction; // processing fee + 18% GST
     const tbillRate = 0.071; // 7.10% RBI Sovereign 364-Day T-Bill benchmark yield
-    
+
     // Future Value after 1, 3, 5 years if saved friction is invested instead of leaked to bank/GST:
     const fv1Year = Math.round(savedFriction * Math.pow(1 + tbillRate, 1));
     const fv3Year = Math.round(savedFriction * Math.pow(1 + tbillRate, 3));
@@ -313,6 +371,71 @@ export const ExtensionCommitGuardModal: React.FC<ExtensionModalProps> = ({
     return allOffers.filter((o) => o.id !== selectedOffer?.id);
   }, [allOffers, selectedOffer]);
 
+  // Whether the currently selected option actually blocks a credit line at all — UPI/direct
+  // debit/cool-off settle instantly from the bank account, so CUR is not applicable to them.
+  const isCreditBasedSelection = !!selectedOffer && !/upi|direct debit|cool-off/i.test(selectedOffer.bankOrCard);
+
+  // Udemy's real checkout never offers bank EMI (only UPI/Cards/Net Banking/Wallet) — showing
+  // fabricated "Effective APR" math for an EMI plan that was never actually on offer there
+  // would be misleading, not just unstyled. Every other surface genuinely can carry bank EMI.
+  const hasRealEmiOption = surfaceType !== 'UDEMY';
+
+  // Pre-Checkout Credit Utilization Ratio (CUR): the bank blocks the FULL principal of
+  // whichever payment option is currently selected, not just the monthly EMI installment.
+  const curResult = useMemo(() => {
+    return calculateCreditUtilizationImpact({
+      orderPrincipal: selectedOffer?.netPrice ?? productPrice,
+      existingCardBalance: existingCardBalanceInput,
+      totalCreditLimit: creditLimitInput,
+    });
+  }, [selectedOffer, productPrice, existingCardBalanceInput, creditLimitInput]);
+
+  // Dual-Ledger Forfeited Card Reward: travel surfaces use the card's travel reward rate,
+  // every other surface uses the online rate — a flat "5% cashback" figure is wrong for
+  // premium cards where travel and online rates genuinely differ.
+  const spendCategory: SpendCategory = surfaceType === 'TRAVEL' ? 'travel' : 'online';
+  const selectedCardProfile = findCardRewardProfile(selectedCardId) || CARD_REWARD_PROFILES[0];
+  const activeCardRatePercent = isCustomCardRate ? customCardRatePercent : getCardRewardRate(selectedCardProfile, spendCategory);
+  const activeCardLabel = isCustomCardRate ? `Custom card (${customCardRatePercent}%)` : selectedCardProfile.shortLabel;
+
+  const forfeitedRewardResult = useMemo(() => {
+    return calculateForfeitedCardReward({
+      orderPrincipal: selectedOffer?.netPrice ?? productPrice,
+      rewardRatePercent: activeCardRatePercent,
+    });
+  }, [selectedOffer, productPrice, activeCardRatePercent]);
+
+  const filteredCardList = useMemo(() => {
+    const q = cardSearchQuery.trim().toLowerCase();
+    if (!q) return CARD_REWARD_PROFILES;
+    return CARD_REWARD_PROFILES.filter(
+      (c) => c.shortLabel.toLowerCase().includes(q) || c.bankOrCard.toLowerCase().includes(q)
+    );
+  }, [cardSearchQuery]);
+
+  // One plain-English verdict line for the selected option — the entire "3-second read."
+  const verdictLine = useMemo(() => {
+    if (!selectedOffer) return '';
+    if (selectedOffer.rating === 'BEST') return `Best value — ${selectedOffer.effectiveBenefit.toLowerCase()}.`;
+    if (selectedOffer.rating === 'AVOID') return `Costs more than it looks — ${selectedOffer.effectiveBenefit.toLowerCase()}.`;
+    return selectedOffer.effectiveBenefit;
+  }, [selectedOffer]);
+
+  const ratingInk = (rating: ScrapedOffer['rating']) =>
+    rating === 'BEST' ? 'text-ledger-credit' : rating === 'AVOID' ? 'text-ledger-debit' : 'text-ledger-navy';
+
+  const ratingStampLabel = (rating: ScrapedOffer['rating']) =>
+    rating === 'BEST' ? 'Best value' : rating === 'AVOID' ? 'Costly' : rating === 'GOOD' ? 'Fair deal' : '';
+
+  const stampClasses = (rating: ScrapedOffer['rating']) =>
+    `inline-block -rotate-2 border px-2 py-0.5 text-[11px] font-bold tracking-tight ${
+      rating === 'BEST'
+        ? 'border-ledger-credit text-ledger-credit'
+        : rating === 'AVOID'
+        ? 'border-ledger-debit text-ledger-debit'
+        : 'border-ledger-navy/40 text-ledger-navy'
+    }`;
+
   return (
     <div
       className="commitguard-backdrop"
@@ -322,784 +445,650 @@ export const ExtensionCommitGuardModal: React.FC<ExtensionModalProps> = ({
       }}
     >
       <div className="commitguard-card">
-        
-        {/* Header Bar with explicit Cancel / Stay on page 'X' */}
-        <div className="flex items-center justify-between px-6 py-3.5 border-b border-slate-100 bg-white">
-          <div className="flex items-center gap-2.5 text-slate-900 font-bold text-base sm:text-lg">
-            <div className={`p-1.5 rounded-lg text-white shadow-sm ${
-              surfaceType === 'TRAVEL'
-                ? 'bg-sky-600'
-                : surfaceType === 'EDTECH'
-                ? 'bg-indigo-600'
-                : surfaceType === 'UDEMY'
-                ? 'bg-purple-600'
-                : surfaceType === 'AMAZON'
-                ? 'bg-amber-600'
-                : 'bg-emerald-600'
-            }`}>
-              {surfaceType === 'TRAVEL' ? (
-                <Plane className="w-5 h-5" />
-              ) : surfaceType === 'EDTECH' ? (
-                <GraduationCap className="w-5 h-5" />
-              ) : surfaceType === 'UDEMY' ? (
-                <BookOpen className="w-5 h-5" />
-              ) : surfaceType === 'AMAZON' ? (
-                <ShoppingBag className="w-5 h-5" />
-              ) : (
-                <Sparkles className="w-5 h-5" />
-              )}
-            </div>
-            <div>
-              <span className="text-slate-900">
-                {surfaceType === 'TRAVEL'
-                  ? 'CommitGuard Travel: TNPL & EMI Reality Check'
-                  : surfaceType === 'EDTECH'
-                  ? 'CommitGuard EdTech: Education Loan Subvention Truth'
-                  : surfaceType === 'UDEMY'
-                  ? 'CommitGuard Udemy: Impulse Buy & BNPL Interceptor'
-                  : surfaceType === 'AMAZON'
-                  ? 'CommitGuard Amazon: Live Card & EMI Optimization'
-                  : surfaceType === 'FLIPKART'
-                  ? 'CommitGuard Flipkart: Live Card & EMI Optimization'
-                  : 'CommitGuard Smart Checkout Intel'}
-              </span>
-              <div className="text-[11px] text-slate-500 font-normal">
-                {surfaceType === 'TRAVEL'
-                  ? 'MakeMyTrip & Cleartrip: High-APR TNPL Cascades vs 6M Liquid SIP'
-                  : surfaceType === 'EDTECH'
-                  ? 'UpGrad: Exposing Hidden Subvention Surcharges & True Debt ROI'
-                  : surfaceType === 'UDEMY'
-                  ? '30-Day Cool-Off & Micro-BNPL Fee Elimination'
-                  : 'Live Scraped Banking & Friction Engine'}
+        {/* Navy header band — the "cover" of the ledger slip */}
+        <div className="bg-ledger-navy px-6 py-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <ShieldCheck className="w-5 h-5 text-ledger-seal shrink-0" />
+            <div className="min-w-0">
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <span className="text-white font-bold text-lg">CommitGuard</span>
+                <span className="text-white/50 text-sm font-medium">{SURFACE_LABEL[surfaceType]}</span>
               </div>
+              <p className="text-white/70 text-sm mt-0.5">The real cost, before you pay.</p>
             </div>
           </div>
-
-          <div className="flex items-center gap-3">
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 text-[11px] font-mono font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>&lt;1.2ms Real-Time Scraper</span>
+          <div className="flex items-center gap-3 shrink-0">
+            <span className="hidden sm:flex items-center gap-1.5 text-[11px] text-white/40 font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-ledger-seal animate-pulse" />
+              live · &lt;1.2ms
             </span>
-
-            {/* 'X' Close button stays on page */}
             <button
               onClick={onCancelStayOnPage}
-              title="Cancel & Stay on Page (Escape)"
+              title="Cancel and stay on page (Escape)"
               aria-label="Cancel"
-              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+              className="p-1.5 rounded text-white/60 hover:text-white hover:bg-white/10 transition-colors"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Product Scraped Summary Bar */}
-        <div className="px-6 py-3 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-700 truncate max-w-xs sm:max-w-md">
-              {productName}
+        {/* Paper body */}
+        <div className="bg-ledger-paper max-h-[85vh] overflow-y-auto">
+          {/* Item + price ledger line */}
+          <div className="px-6 py-3.5 border-b border-ledger-rule flex items-center justify-between gap-3">
+            <span className="text-base font-semibold text-ledger-navy truncate">{productName}</span>
+            <span className="flex items-baseline gap-2 shrink-0 font-mono tabular-nums">
+              {typeof originalPrice === 'number' && originalPrice > 0 && (
+                <span className="text-sm text-ledger-navy/40 line-through">₹{originalPrice.toLocaleString('en-IN')}</span>
+              )}
+              <span className="text-xl font-bold text-ledger-navy">₹{productPrice.toLocaleString('en-IN')}</span>
+              {typeof discountPercent === 'number' && discountPercent > 0 && (
+                <span className="text-[11px] font-bold text-ledger-credit">{discountPercent}% off</span>
+              )}
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            {originalPrice && (
-              <span className="text-xs text-slate-400 line-through">
-                ₹{originalPrice.toLocaleString('en-IN')}
-              </span>
-            )}
-            <span className="text-base font-black text-slate-900">
-              ₹{productPrice.toLocaleString('en-IN')}
-            </span>
-            {discountPercent && (
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
-                {discountPercent}% OFF
-              </span>
-            )}
-          </div>
-        </div>
 
-        {/* Multi-Item Cart Alert Banner */}
-        {isMultiItemCart && (
-          <div className="mx-6 my-3 p-3.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 shadow-sm text-slate-800">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-start gap-2.5">
-                <span className="p-1.5 rounded-lg bg-amber-500/10 text-amber-700 mt-0.5 shrink-0">
-                  <ShoppingBag className="w-4 h-4" />
+          {/* Multi-item cart notice */}
+          {isMultiItemCart && (
+            <div className="mx-6 mt-3.5 p-3 border border-ledger-rule bg-white text-sm text-ledger-navy space-y-1.5">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <span className="font-bold">{cartItemCount} items in this cart · ₹{productPrice.toLocaleString('en-IN')} total</span>
+                <span className={`font-mono tabular-nums font-bold ${multiCartRisk.meetsMinThreshold ? 'text-ledger-credit' : 'text-ledger-debit'}`}>
+                  {multiCartRisk.meetsMinThreshold ? 'Meets EMI minimum' : 'Below ₹3,000 EMI minimum'}
                 </span>
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-bold text-amber-950 uppercase tracking-wide">
-                      Multi-Item Cart Detected
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full bg-amber-200/70 text-amber-900 text-[11px] font-bold">
-                      {cartItemCount} Items • ₹{productPrice.toLocaleString('en-IN')} Total
-                    </span>
-                    {!multiCartRisk.meetsMinThreshold ? (
-                      <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-bold">
-                        ⚠️ Below ₹3,000 Minimum for EMI
-                      </span>
-                    ) : (
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                        Cart Meets ₹3,000 Min
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-[12px] text-amber-900/90 mt-1 leading-snug">
-                    <strong>⚠️ Mixed-Cart EMI Risk:</strong> If even <em>one</em> item in this cart is ineligible for No-Cost EMI, banks frequently void the merchant discount and charge <strong>15% standard loan interest (~₹{multiCartRisk.totalRiskAmount.toLocaleString('en-IN')} extra)</strong> across the entire order!
-                  </p>
-                </div>
               </div>
-            </div>
-
-            <div className="mt-2.5 pt-2.5 border-t border-amber-200/70 flex flex-wrap items-center justify-between gap-2 text-[11px]">
-              <div className="flex items-center gap-1.5 text-amber-950 font-medium">
-                <span className="text-emerald-700 font-bold">💡 Split-Order Recommendation:</span>
-                <span>Checkout high-ticket EMI item alone to guarantee 100% interest waiver, then buy accessories via UPI.</span>
-              </div>
+              <p className="text-ledger-navy/70 leading-relaxed">
+                If even one item here doesn't qualify for No-Cost EMI, banks often void the discount for the whole order — that could add roughly ₹{multiCartRisk.totalRiskAmount.toLocaleString('en-IN')} in standard interest. Checking out the high-value item alone keeps the EMI discount intact.
+              </p>
               {cartItemsPreview && cartItemsPreview.length > 0 && (
-                <div className="text-[10px] text-slate-500 truncate max-w-full italic">
-                  Detected in cart: {cartItemsPreview.slice(0, 3).join(', ')}
-                </div>
+                <p className="text-ledger-navy/40 text-xs italic">In cart: {cartItemsPreview.slice(0, 3).join(', ')}</p>
               )}
-            </div>
-          </div>
-        )}
-
-        {/* Tab Navigation: Card Offers vs EMI Friction Breakdown */}
-        <div className="flex border-b border-slate-200 bg-slate-100/70 p-1.5 gap-1.5">
-          <button
-            type="button"
-            onClick={() => setActiveTab('CARD_OFFERS')}
-            className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-              activeTab === 'CARD_OFFERS'
-                ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-            }`}
-          >
-            <CreditCard className="w-4 h-4 text-emerald-600" />
-            <span>Card & Payment Intel (Best vs Worst)</span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 font-mono">
-              {displayOffers.length} Options
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('EMI_FRICTION')}
-            className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-              activeTab === 'EMI_FRICTION'
-                ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
-            }`}
-          >
-            <AlertTriangle className="w-4 h-4 text-amber-500" />
-            <span>
-              {surfaceType === 'UDEMY'
-                ? `Installment / BNPL Friction (Save ₹${recoveryCompounding.savedFriction})`
-                : `No-Cost EMI Friction (${mathResult.effectiveAnnualPercentageRate}% APR)`}
-            </span>
-          </button>
-        </div>
-
-        {/* Modal Scrollable Body */}
-        <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
-          
-          {/* TAB 1: CARD & PAYMENT INTEL (Shows User's Selected Method First, plus Expandable Comparison) */}
-          {activeTab === 'CARD_OFFERS' && (
-            <div className="space-y-4">
-              
-              {/* 0. LIVE DISCOVERED PAYMENT METHODS SELECTOR */}
-              <div className="rounded-xl border border-slate-200 bg-white shadow-xs p-3.5 space-y-2.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-slate-700 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Payment Methods Discovered on Page:</span>
-                  </span>
-                  <span className="text-[10px] text-emerald-700 font-mono font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                    Live Scraped
-                  </span>
-                </div>
-
-                {/* Chips for all discovered offers */}
-                <div className="flex flex-wrap gap-1.5">
-                  {allOffers.map((offer) => (
-                    <button
-                      key={offer.id}
-                      type="button"
-                      onClick={() => {
-                        setSimulatedTenureOffer(null);
-                        setSelectedOfferId(offer.id);
-                      }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer border flex items-center gap-1.5 ${
-                        selectedOffer?.id === offer.id
-                          ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
-                          : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200 font-medium'
-                      }`}
-                    >
-                      <span>{offer.bankOrCard}</span>
-                      {offer.rating === 'BEST' && <span className="text-emerald-400 text-[10px]">★</span>}
-                    </button>
-                  ))}
-                </div>
-
-                {/* If selected offer supports tenures, render dynamic tenure chips */}
-                {selectedOffer && !/upi|direct|cool-off/i.test(selectedOffer.bankOrCard) && (
-                  <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1">
-                      <span>Simulate EMI Tenure on this Card:</span>
-                    </span>
-                    <div className="flex items-center gap-1.5">
-                      {[3, 6, 9, 12, 18, 24, 36].map((m) => (
-                        <button
-                          key={m}
-                          type="button"
-                          onClick={() => handleSimulateTenure(m, selectedOffer)}
-                          className={`px-2.5 py-1 rounded-md text-[11px] font-mono font-bold transition-all cursor-pointer border ${
-                            customTenure === m && simulatedTenureOffer
-                              ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                              : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200'
-                          }`}
-                        >
-                          {m}m
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-              
-              {/* 1. HERO CARD: USER'S SELECTED PAYMENT OPTION */}
-              {selectedOffer && (
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-900 text-white inline-flex items-center gap-1.5 shadow-sm">
-                      <Zap className="w-3 h-3 text-amber-400" />
-                      <span>Your Selected Payment Option</span>
-                    </span>
-                    <span className="text-[11px] font-semibold text-slate-500">
-                      Live Pre-Commitment Reality Check
-                    </span>
-                  </div>
-
-                  <div
-                    className={`p-4 rounded-xl border-2 transition-all ${
-                      selectedOffer.rating === 'BEST'
-                        ? 'bg-emerald-50/90 border-emerald-400 ring-2 ring-emerald-200'
-                        : selectedOffer.rating === 'AVOID'
-                        ? 'bg-red-50/90 border-red-300 ring-2 ring-red-100'
-                        : 'bg-sky-50/90 border-sky-300 ring-2 ring-sky-100'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="space-y-1.5 flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-black text-base text-slate-900">
-                            {selectedOffer.bankOrCard}
-                          </span>
-
-                          {/* Badge */}
-                          {selectedOffer.rating === 'BEST' && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-600 text-white shadow-sm">
-                              <ThumbsUp className="w-3 h-3" />
-                              RECOMMENDED: BEST VALUE
-                            </span>
-                          )}
-                          {selectedOffer.rating === 'GOOD' && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
-                              GOOD OFFER
-                            </span>
-                          )}
-                          {selectedOffer.rating === 'AVOID' && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 text-red-800 border border-red-200">
-                              <ThumbsDown className="w-3 h-3 text-red-600" />
-                              AVOID: HIDDEN CHARGES
-                            </span>
-                          )}
-                        </div>
-
-                        <p className="text-xs text-slate-700 font-medium">
-                          {selectedOffer.description}
-                        </p>
-
-                        <div className="text-xs text-slate-800 font-normal flex items-start gap-1.5 pt-1 bg-white/70 p-2 rounded-lg border border-slate-200/60">
-                          <span className="w-2 h-2 rounded-full bg-slate-500 mt-1 shrink-0" />
-                          <span>{selectedOffer.reason}</span>
-                        </div>
-                      </div>
-
-                      {/* Net Cost & Benefit */}
-                      <div className="text-right shrink-0 bg-white/80 p-2.5 rounded-xl border border-slate-200/80 shadow-xs">
-                        <div className="text-[11px] text-slate-500 font-semibold">
-                          True Outflow
-                        </div>
-                        <div className={`text-lg font-black ${
-                          selectedOffer.rating === 'BEST' ? 'text-emerald-700' : selectedOffer.rating === 'AVOID' ? 'text-red-600' : 'text-slate-900'
-                        }`}>
-                          ₹{selectedOffer.netPrice.toLocaleString('en-IN')}
-                        </div>
-                        <div className={`text-[10px] font-bold mt-0.5 ${
-                          selectedOffer.rating === 'BEST' ? 'text-emerald-600' : selectedOffer.rating === 'AVOID' ? 'text-red-700' : 'text-slate-600'
-                        }`}>
-                          {selectedOffer.effectiveBenefit}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* 2. ACCORDION: VIEW OTHER PAYMENT METHODS AS WELL */}
-              {otherOffers.length > 0 && (
-                <div className="pt-1">
-                  <button
-                    type="button"
-                    onClick={() => setShowAllMethods(!showAllMethods)}
-                    className="w-full py-2.5 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-between transition-colors border border-slate-200"
-                  >
-                    <span className="flex items-center gap-2">
-                      <Sliders className="w-3.5 h-3.5 text-slate-600" />
-                      <span>{showAllMethods ? 'Hide Alternative Payment Methods' : `View & Compare Other Payment Methods (${otherOffers.length} Available)`}</span>
-                    </span>
-                    {showAllMethods ? <ChevronUp className="w-4 h-4 text-slate-600" /> : <ChevronDown className="w-4 h-4 text-slate-600" />}
-                  </button>
-
-                  {/* Expanded list of alternative offers */}
-                  {showAllMethods && (
-                    <div className="space-y-2.5 mt-3 animate-in fade-in duration-200">
-                      <div className="text-[11px] font-semibold text-slate-500 flex items-center justify-between px-1">
-                        <span>Click any method to inspect its Reality Check:</span>
-                        <span className="text-[10px] text-emerald-700 font-mono font-bold">👆 Click to Switch</span>
-                      </div>
-                      {otherOffers.map((offer) => {
-                        const isBest = offer.rating === 'BEST';
-                        const isAvoid = offer.rating === 'AVOID';
-                        const isGood = offer.rating === 'GOOD';
-
-                        return (
-                          <div
-                            key={offer.id}
-                            onClick={() => setSelectedOfferId(offer.id)}
-                            role="button"
-                            tabIndex={0}
-                            className={`p-3.5 rounded-xl border transition-all cursor-pointer hover:shadow-md hover:scale-[1.01] active:scale-[0.99] group ${
-                              isBest
-                                ? 'bg-emerald-50/70 hover:bg-emerald-100/80 border-emerald-300 ring-1 ring-emerald-200'
-                                : isAvoid
-                                ? 'bg-red-50/60 hover:bg-red-100/80 border-red-200'
-                                : 'bg-white hover:bg-slate-50 border-slate-200'
-                            }`}
-                            title="Click to select this payment method and inspect its reality check"
-                          >
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="space-y-1">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="font-bold text-sm text-slate-900 group-hover:text-emerald-700 transition-colors">
-                                    {offer.bankOrCard}
-                                  </span>
-
-                                  {/* Badge */}
-                                  {isBest && (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-600 text-white shadow-xs">
-                                      <ThumbsUp className="w-2.5 h-2.5" />
-                                      RECOMMENDED: BEST VALUE
-                                    </span>
-                                  )}
-                                  {isGood && (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-100 text-sky-800 border border-sky-200">
-                                      GOOD OFFER
-                                    </span>
-                                  )}
-                                  {isAvoid && (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-red-100 text-red-800 border border-red-200">
-                                      <ThumbsDown className="w-2.5 h-2.5 text-red-600" />
-                                      AVOID: HIDDEN CHARGES
-                                    </span>
-                                  )}
-                                </div>
-
-                                <p className="text-xs text-slate-600">
-                                  {offer.description}
-                                </p>
-
-                                <div className="text-[11px] text-slate-700 font-medium flex items-center gap-1.5 pt-0.5">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                                  <span>{offer.reason}</span>
-                                </div>
-                              </div>
-
-                              {/* Net Cost & Benefit */}
-                              <div className="text-right shrink-0">
-                                <div className="text-xs text-slate-500 font-medium">
-                                  Effective Price
-                                </div>
-                                <div className={`text-base font-black ${
-                                  isBest ? 'text-emerald-700' : isAvoid ? 'text-red-600' : 'text-slate-900'
-                                }`}>
-                                  ₹{offer.netPrice.toLocaleString('en-IN')}
-                                </div>
-                                <div className={`text-[10px] font-bold ${
-                                  isBest ? 'text-emerald-600' : isAvoid ? 'text-red-700' : 'text-slate-600'
-                                }`}>
-                                  {offer.effectiveBenefit}
-                                </div>
-                                <div className="text-[9px] text-slate-400 mt-1 font-semibold group-hover:text-emerald-600">
-                                  Select ➔
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Actionable Advice Box */}
-              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-1">
-                <div className="font-bold text-slate-900 flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span>
-                    {surfaceType === 'TRAVEL'
-                      ? 'CommitGuard Travel Advisory (TNPL Warning):'
-                      : surfaceType === 'EDTECH'
-                      ? 'CommitGuard EdTech Advisory (Subvention Reality):'
-                      : surfaceType === 'UDEMY'
-                      ? 'CommitGuard Udemy Advisory (Impulse & Artificial Scarcity):'
-                      : surfaceType === 'AMAZON'
-                      ? 'CommitGuard Amazon Advisory (Cashback vs EMI Drag):'
-                      : 'CommitGuard Flipkart Advisory (Cashback vs EMI Drag):'}
-                  </span>
-                </div>
-                <p className="text-slate-600 text-[11px] leading-relaxed">
-                  {surfaceType === 'TRAVEL' ? (
-                    <>
-                      <strong>Travel Now, Pay Later (TNPL)</strong> advertises low monthly tranches but triggers <strong>24% to 36% penalty APRs</strong> and compounding bounce fees if any installment is missed post-trip. <strong>Recommended Alternative:</strong> Start a <strong>6-month Liquid Fund SIP</strong> at 7.10% yield to book your trip 100% debt-free.
-                    </>
-                  ) : surfaceType === 'EDTECH' ? (
-                    <>
-                      <strong>Education Loan "0% Subvention"</strong> packages frequently embed an upfront <strong>3% to 5% institutional subvention surcharge</strong> into course pricing plus processing fees. If you pay via direct NEFT/UPI or company sponsorship, negotiate the 5% cash rebate.
-                    </>
-                  ) : surfaceType === 'UDEMY' ? (
-                    <>
-                      <strong>Udemy Countdown Timers:</strong> The "Sale ends in 5 hours" timer resets automatically on next browser session. Over <strong>87% of purchased self-paced courses are never completed</strong>. If paying, use direct UPI without EMI lock-ins, or invest in a <strong>Liquid Fund</strong> until you have scheduled hours to study.
-                    </>
-                  ) : surfaceType === 'AMAZON' ? (
-                    <>
-                      If you hold an <strong>Amazon Pay ICICI Card</strong>, pay in full to lock an unconditional <strong>5% Amazon Pay balance cashback</strong>. If you choose <strong>No-Cost EMI</strong>, you will lose ~₹{mathResult.totalHiddenFriction.toLocaleString('en-IN')} to non-refundable 18% GST on interest and bank processing fees.
-                    </>
-                  ) : (
-                    <>
-                      If you hold a <strong>Flipkart Axis Bank Card</strong>, pay in full to lock an unconditional <strong>5% statement cashback</strong>. If you use <strong>No-Cost EMI</strong>, you will lose ~₹{mathResult.totalHiddenFriction.toLocaleString('en-IN')} to non-refundable 18% GST and processing fees.
-                    </>
-                  )}
-                </p>
-              </div>
             </div>
           )}
 
-          {/* TAB 2: EMI FRICTION & AMORTIZATION BREAKDOWN */}
-          {activeTab === 'EMI_FRICTION' && (
-            <div className="space-y-5">
-              {/* Interactive Metric Cards (Instant Dynamic Recalculation) */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {/* Effective APR */}
-                <div className="p-3.5 rounded-xl bg-red-50 border border-red-200">
-                  <div className="text-[11px] font-bold text-red-800 uppercase tracking-wide">
-                    Effective APR
-                  </div>
-                  <div className="text-2xl font-black text-red-600 mt-1">
-                    {mathResult.effectiveAnnualPercentageRate}%
-                  </div>
-                  <div className="text-[10px] text-red-700/80 mt-0.5">
-                    vs Advertised <strong>0% APR</strong>
-                  </div>
-                </div>
-
-                {/* Total GST Drag */}
-                <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200">
-                  <div className="text-[11px] font-bold text-amber-800 uppercase tracking-wide">
-                    Total GST + Fee Drag
-                  </div>
-                  <div className="text-2xl font-black text-amber-700 mt-1">
-                    ₹{mathResult.totalHiddenFriction.toLocaleString('en-IN')}
-                  </div>
-                  <div className="text-[10px] text-amber-800/80 mt-0.5">
-                    ₹{processingFee} fee + ₹{mathResult.totalGstOnInterest.toFixed(2)} GST
-                  </div>
-                </div>
-
-                {/* Monthly Outflow */}
-                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-                  <div className="text-[11px] font-bold text-slate-700 uppercase tracking-wide">
-                    Monthly Outflow
-                  </div>
-                  <div className="text-2xl font-black text-slate-900 mt-1">
-                    ₹{mathResult.monthlyBaseEmi.toLocaleString('en-IN')}
-                  </div>
-                  <div className="text-[10px] text-slate-500 mt-0.5">
-                    Locked for {tenure} installments
-                  </div>
-                </div>
+          <div className="px-6 py-4 space-y-4">
+            {/* Payment methods discovered on the page — compact chip row */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-semibold text-ledger-navy/70">Payment methods on this page</span>
+                <span className="text-[11px] font-mono text-ledger-navy/40">scraped live</span>
               </div>
-
-              {/* 3 Plain-English Bullets */}
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
-                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-800">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span>3-Bullet Plain-English Translation</span>
-                </div>
-
-                <ul className="space-y-2 text-xs sm:text-sm text-slate-700 leading-relaxed">
-                  <li className="flex items-start gap-2.5">
-                    <span className="w-2 h-2 rounded-full bg-red-600 mt-1.5 shrink-0" />
-                    <span>
-                      <strong className="text-red-700 font-bold">19.93% Effective APR Reality: </strong>
-                      Even though the merchant provides an upfront discount, bank processing fees and statutory 18% GST convert 0% into <strong>{mathResult.effectiveAnnualPercentageRate}% Effective APR</strong>.
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <span className="w-2 h-2 rounded-full bg-amber-600 mt-1.5 shrink-0" />
-                    <span>
-                      <strong className="text-slate-900 font-bold">Unrecoverable Monthly Drag: </strong>
-                      Every month, your bank card statement bills 18% statutory GST on the interest component. You incur a guaranteed <strong>₹{mathResult.totalHiddenFriction.toLocaleString('en-IN')}</strong> in pure administrative leak.
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-600 mt-1.5 shrink-0" />
-                    <span>
-                      <strong className="text-emerald-800 font-bold">Zero-Friction Baseline: </strong>
-                      Paying upfront via direct UPI or debit card eliminates the ₹{mathResult.totalHiddenFriction.toLocaleString('en-IN')} drag completely while keeping your monthly credit limit untouched.
-                    </span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Perfectly Aligned Discrete Slider with Clickable Steps */}
-              <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-sm space-y-3">
-                <div className="flex items-center justify-between text-xs">
-                  <label htmlFor="ext-tenure-slider" className="font-bold text-slate-900 flex items-center gap-1.5">
-                    <Sliders className="w-4 h-4 text-emerald-600" />
-                    <span>Adjust EMI Tenure: <strong className="text-emerald-700 text-sm">{tenure} Months</strong></span>
-                  </label>
-                  <span className="text-[11px] text-slate-500 font-mono">Click any tenure step</span>
-                </div>
-
-                {/* Slider with exact steps mapping 0 to 5 for TENURE_OPTIONS */}
-                <div className="relative pt-1 pb-1">
-                  <input
-                    id="ext-tenure-slider"
-                    type="range"
-                    min={0}
-                    max={TENURE_OPTIONS.length - 1}
-                    step={1}
-                    value={sliderIndex}
-                    onChange={(e) => setSliderIndex(Number(e.target.value))}
-                    className="w-full h-2.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600 focus:outline-none"
-                  />
-
-                  {/* Exact 1-to-1 Horizontally Aligned Step Labels */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      paddingTop: '8px',
-                      width: '100%',
+              <div className="flex flex-wrap gap-1.5">
+                {allOffers.map((offer) => (
+                  <button
+                    key={offer.id}
+                    type="button"
+                    onClick={() => {
+                      setSimulatedTenureOffer(null);
+                      setSelectedOfferId(offer.id);
                     }}
+                    className={`px-3 py-1.5 text-sm font-semibold border transition-colors ${
+                      selectedOffer?.id === offer.id
+                        ? 'bg-ledger-navy text-white border-ledger-navy'
+                        : 'bg-white text-ledger-navy/80 border-ledger-rule hover:border-ledger-navy/40'
+                    }`}
                   >
-                    {TENURE_OPTIONS.map((opt, idx) => (
+                    {offer.bankOrCard}
+                  </button>
+                ))}
+              </div>
+
+              {/* Tenure simulator, only for non-instant selections */}
+              {selectedOffer && !/upi|direct|cool-off/i.test(selectedOffer.bankOrCard) && (
+                <div className="pt-2 border-t border-ledger-rule flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-xs font-semibold text-ledger-navy/70">Try a different tenure on this card:</span>
+                  <div className="flex items-center gap-1.5">
+                    {[3, 6, 9, 12, 18, 24, 36].map((m) => (
                       <button
-                        key={opt}
+                        key={m}
                         type="button"
-                        onClick={() => setSliderIndex(idx)}
-                        style={{
-                          padding: '4px 8px',
-                          borderRadius: '6px',
-                          fontSize: '12px',
-                          fontFamily: 'monospace',
-                          cursor: 'pointer',
-                          border: sliderIndex === idx ? '1px solid #6ee7b7' : '1px solid transparent',
-                          backgroundColor: sliderIndex === idx ? '#ecfdf5' : 'transparent',
-                          color: sliderIndex === idx ? '#047857' : '#64748b',
-                          fontWeight: sliderIndex === idx ? '800' : '500',
-                          transition: 'all 0.15s ease',
-                        }}
+                        onClick={() => handleSimulateTenure(m, selectedOffer)}
+                        className={`px-2 py-1 text-xs font-mono tabular-nums font-bold border transition-colors ${
+                          customTenure === m && simulatedTenureOffer
+                            ? 'bg-ledger-navy text-white border-ledger-navy'
+                            : 'bg-white text-ledger-navy/70 border-ledger-rule hover:border-ledger-navy/40'
+                        }`}
                       >
-                        {opt}m
+                        {m}m
                       </button>
                     ))}
                   </div>
                 </div>
-              </div>
+              )}
+            </div>
 
-              {/* 🌟 1. Friction Recovery & Compounding Matrix (Prompt Req 1) */}
-              <div className="p-4 rounded-xl border border-emerald-200 bg-gradient-to-br from-emerald-50/80 via-white to-teal-50/50 shadow-sm space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="p-1 rounded-md bg-emerald-600 text-white">
-                      <TrendingUp className="w-3.5 h-3.5" />
+            {/* TIER 1: the whole point — what you picked, the verdict, the true cost */}
+            {selectedOffer && (
+              <div className="border-t-2 border-b-2 border-ledger-navy py-3.5 space-y-2">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-semibold text-ledger-navy/50">You selected</span>
+                      {ratingStampLabel(selectedOffer.rating) && (
+                        <span className={stampClasses(selectedOffer.rating)}>{ratingStampLabel(selectedOffer.rating)}</span>
+                      )}
                     </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wide">
-                        Friction Recovery & Compounding Matrix
-                      </h4>
-                      <p className="text-[10px] text-slate-500">
-                        Preserve leaked bank fees & GST by paying upfront into a <strong>7.10% Sovereign T-Bill</strong>
-                      </p>
-                    </div>
-                  </div>
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-                    RBI Benchmark 7.10%
-                  </span>
-                </div>
-
-                {/* Compounding Comparison Columns */}
-                <div className="grid grid-cols-3 gap-2 pt-1">
-                  <button
-                    type="button"
-                    onClick={() => setCompoundingHorizon('1Y')}
-                    className={`p-2.5 rounded-lg border text-center transition-all cursor-pointer ${
-                      compoundingHorizon === '1Y'
-                        ? 'bg-emerald-900 text-white border-emerald-800 ring-2 ring-emerald-400 shadow-sm scale-[1.02]'
-                        : 'bg-white hover:bg-emerald-50/50 border-emerald-200 text-slate-900 shadow-2xs'
-                    }`}
-                  >
-                    <div className={`text-[10px] font-bold uppercase ${compoundingHorizon === '1Y' ? 'text-emerald-200' : 'text-slate-500'}`}>
-                      1 Year T-Bill
-                    </div>
-                    <div className={`text-sm sm:text-base font-black mt-0.5 ${compoundingHorizon === '1Y' ? 'text-white' : 'text-slate-900'}`}>
-                      ₹{recoveryCompounding.fv1Year.toLocaleString('en-IN')}
-                    </div>
-                    <div className={`text-[9px] font-semibold mt-0.5 ${compoundingHorizon === '1Y' ? 'text-emerald-300' : 'text-emerald-700'}`}>
-                      Preserves ₹{recoveryCompounding.savedFriction.toLocaleString('en-IN')}
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setCompoundingHorizon('3Y')}
-                    className={`p-2.5 rounded-lg border text-center transition-all cursor-pointer ${
-                      compoundingHorizon === '3Y'
-                        ? 'bg-emerald-900 text-white border-emerald-800 ring-2 ring-emerald-400 shadow-sm scale-[1.02]'
-                        : 'bg-white hover:bg-emerald-50/50 border-emerald-200 text-slate-900 shadow-2xs'
-                    }`}
-                  >
-                    <div className={`text-[10px] font-bold uppercase ${compoundingHorizon === '3Y' ? 'text-emerald-200' : 'text-slate-500'}`}>
-                      3 Year Compound
-                    </div>
-                    <div className={`text-sm sm:text-base font-black mt-0.5 ${compoundingHorizon === '3Y' ? 'text-white' : 'text-emerald-700'}`}>
-                      ₹{recoveryCompounding.fv3Year.toLocaleString('en-IN')}
-                    </div>
-                    <div className={`text-[9px] font-semibold mt-0.5 ${compoundingHorizon === '3Y' ? 'text-emerald-300' : 'text-emerald-600'}`}>
-                      +₹{(recoveryCompounding.fv3Year - recoveryCompounding.savedFriction).toLocaleString('en-IN')} yield
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setCompoundingHorizon('5Y')}
-                    className={`p-2.5 rounded-lg border text-center transition-all cursor-pointer ${
-                      compoundingHorizon === '5Y'
-                        ? 'bg-emerald-900 text-white border-emerald-800 ring-2 ring-emerald-400 shadow-sm scale-[1.02]'
-                        : 'bg-white hover:bg-emerald-50/50 border-emerald-200 text-slate-900 shadow-2xs'
-                    }`}
-                  >
-                    <div className={`text-[10px] font-bold uppercase ${compoundingHorizon === '5Y' ? 'text-emerald-300' : 'text-slate-500'}`}>
-                      5 Year Wealth
-                    </div>
-                    <div className={`text-sm sm:text-base font-black mt-0.5 ${compoundingHorizon === '5Y' ? 'text-white' : 'text-slate-900'}`}>
-                      ₹{recoveryCompounding.fv5Year.toLocaleString('en-IN')}
-                    </div>
-                    <div className={`text-[9px] font-semibold mt-0.5 ${compoundingHorizon === '5Y' ? 'text-emerald-200' : 'text-emerald-700'}`}>
-                      +₹{recoveryCompounding.compoundedGain5Y.toLocaleString('en-IN')} pure gain
-                    </div>
-                  </button>
-                </div>
-
-                {/* Pre-Commitment Liquid SIP Comparison */}
-                <div className="p-2.5 rounded-lg bg-slate-900 text-white text-xs flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <PiggyBank className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span className="text-[11px] text-slate-200">
-                      Invest ₹{mathResult.monthlyBaseEmi.toLocaleString('en-IN')}/mo in Liquid Fund SIP instead:
-                    </span>
+                    <p className="font-bold text-ledger-navy text-lg leading-tight">{selectedOffer.bankOrCard}</p>
+                    <p className="text-sm text-ledger-navy/70">{verdictLine}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <span className="text-xs font-black text-emerald-400">
-                      ₹{recoveryCompounding.sipFv.toLocaleString('en-IN')}
-                    </span>
-                    <span className="text-[9px] text-slate-400 block font-mono">
-                      (+₹{recoveryCompounding.sipGain.toLocaleString('en-IN')} yield vs -₹{recoveryCompounding.savedFriction} leak)
-                    </span>
+                    <div className="text-xs text-ledger-navy/50 font-semibold">True cost</div>
+                    <div className={`text-2xl font-bold font-mono tabular-nums ${ratingInk(selectedOffer.rating)}`}>
+                      ₹{selectedOffer.netPrice.toLocaleString('en-IN')}
+                    </div>
                   </div>
                 </div>
+                <p className="text-sm text-ledger-navy/80 leading-relaxed border-l-2 border-ledger-rule pl-2.5">
+                  {selectedOffer.reason}
+                </p>
               </div>
+            )}
 
-              {/* Expandable Amortization Table */}
-              <div className="border border-slate-200 rounded-xl overflow-hidden bg-white">
-                <button
-                  onClick={() => setIsProofOpen(!isProofOpen)}
-                  className="w-full px-4 py-2.5 flex items-center justify-between text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors"
-                >
-                  <span>Deterministic Monthly Breakdown ({tenure} Months)</span>
-                  {isProofOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                </button>
+            {/* TIER 2: everything below is one tap away, not shoved in front of you */}
+            <div className="divide-y divide-ledger-rule border border-ledger-rule bg-white">
+              {otherOffers.length > 0 && (
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAllMethods(!showAllMethods)}
+                    className="w-full px-3.5 py-2.5 flex items-center justify-between text-sm font-semibold text-ledger-navy hover:bg-ledger-paper/60 transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Sliders className="w-3.5 h-3.5 text-ledger-navy/50" />
+                      Compare other ways to pay ({otherOffers.length})
+                    </span>
+                    {showAllMethods ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </button>
+                  {showAllMethods && (
+                    <div className="px-3.5 pb-3.5 space-y-2">
+                      {otherOffers.map((offer) => (
+                        <button
+                          key={offer.id}
+                          type="button"
+                          onClick={() => setSelectedOfferId(offer.id)}
+                          className="w-full text-left p-3 border border-ledger-rule hover:border-ledger-navy/40 transition-colors"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="space-y-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-semibold text-base text-ledger-navy">{offer.bankOrCard}</span>
+                                {ratingStampLabel(offer.rating) && (
+                                  <span className={stampClasses(offer.rating)}>{ratingStampLabel(offer.rating)}</span>
+                                )}
+                              </div>
+                              <p className="text-sm text-ledger-navy/60">{offer.description}</p>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <div className={`text-base font-bold font-mono tabular-nums ${ratingInk(offer.rating)}`}>
+                                ₹{offer.netPrice.toLocaleString('en-IN')}
+                              </div>
+                              <div className="text-[11px] text-ledger-navy/50">{offer.effectiveBenefit}</div>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
-                {isProofOpen && (
-                  <div className="p-3 border-t border-slate-100 max-h-44 overflow-y-auto">
-                    <table className="w-full text-[10px] text-left">
-                      <thead className="bg-slate-50 text-slate-600 font-bold border-b border-slate-200 sticky top-0">
-                        <tr>
-                          <th className="py-1.5 px-2">Month</th>
-                          <th className="py-1.5 px-2">Principal</th>
-                          <th className="py-1.5 px-2">Interest</th>
-                          <th className="py-1.5 px-2 text-red-600">18% GST</th>
-                          <th className="py-1.5 px-2 font-bold">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 text-slate-600 font-mono">
-                        {mathResult.schedule.map((row) => (
-                          <tr key={row.month}>
-                            <td className="py-1 px-2 font-bold">{row.month}</td>
-                            <td className="py-1 px-2">₹{row.principalComponent.toLocaleString('en-IN')}</td>
-                            <td className="py-1 px-2">₹{row.interestComponent.toLocaleString('en-IN')}</td>
-                            <td className="py-1 px-2 text-red-600">₹{row.gstOnInterest.toFixed(2)}</td>
-                            <td className="py-1 px-2 font-bold text-slate-900">₹{row.totalMonthlyCashflow.toLocaleString('en-IN')}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
+              {/* Credit limit impact (CIBIL / CUR) */}
+              {isCreditBasedSelection && (
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setIsCurOpen(!isCurOpen)}
+                    className="w-full px-3.5 py-2.5 flex items-center justify-between text-sm font-semibold text-ledger-navy hover:bg-ledger-paper/60 transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <CreditCard className="w-3.5 h-3.5 text-ledger-navy/50" />
+                      Credit limit impact
+                      <span className={`font-mono tabular-nums text-xs ${curResult.riskTier === 'DANGER' ? 'text-ledger-debit' : curResult.riskTier === 'CAUTION' ? 'text-ledger-seal' : 'text-ledger-credit'}`}>
+                        {curResult.utilizationRatioPercent}%
+                      </span>
+                    </span>
+                    {isCurOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </button>
+                  {isCurOpen && (
+                    <div className="px-3.5 pb-3.5 space-y-3">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <span className="text-xs font-semibold text-ledger-navy/60">Your total card limit</span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {CREDIT_LIMIT_PRESETS.map((preset) => (
+                            <button
+                              key={preset}
+                              type="button"
+                              onClick={() => {
+                                setCreditLimitInput(preset);
+                                setIsCustomLimit(false);
+                              }}
+                              className={`px-2.5 py-1 text-xs font-semibold border transition-colors ${
+                                !isCustomLimit && creditLimitInput === preset
+                                  ? 'bg-ledger-navy text-white border-ledger-navy'
+                                  : 'bg-white text-ledger-navy/70 border-ledger-rule hover:border-ledger-navy/40'
+                              }`}
+                            >
+                              {preset >= 100000 ? `₹${preset / 100000}L` : `₹${preset / 1000}k`}
+                            </button>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => setIsCustomLimit(true)}
+                            className={`px-2.5 py-1 text-xs font-semibold border transition-colors ${
+                              isCustomLimit
+                                ? 'bg-ledger-navy text-white border-ledger-navy'
+                                : 'bg-white text-ledger-navy/70 border-ledger-rule hover:border-ledger-navy/40'
+                            }`}
+                          >
+                            Custom
+                          </button>
+                        </div>
+                      </div>
+
+                      {isCustomLimit && (
+                        <input
+                          type="number"
+                          min={0}
+                          value={creditLimitInput}
+                          onChange={(e) => setCreditLimitInput(Math.max(0, Number(e.target.value) || 0))}
+                          placeholder="Your total credit limit (₹)"
+                          className="w-full px-3 py-1.5 border border-ledger-rule text-sm font-semibold text-ledger-navy focus:outline-none focus:border-ledger-navy bg-white"
+                        />
+                      )}
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-ledger-navy/60 shrink-0">Already spent on this card</span>
+                        <input
+                          type="number"
+                          min={0}
+                          value={existingCardBalanceInput || ''}
+                          onChange={(e) => setExistingCardBalanceInput(Math.max(0, Number(e.target.value) || 0))}
+                          placeholder="₹0"
+                          className="w-28 px-2.5 py-1 border border-ledger-rule text-xs font-mono tabular-nums text-ledger-navy focus:outline-none focus:border-ledger-navy bg-white"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between text-xs font-mono tabular-nums">
+                          <span className="text-ledger-navy/60">
+                            ₹{curResult.blockedAmount.toLocaleString('en-IN')} of ₹{curResult.totalCreditLimit.toLocaleString('en-IN')} blocked
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full bg-ledger-rule/60">
+                          <div
+                            className={`h-full ${
+                              curResult.riskTier === 'SAFE' ? 'bg-ledger-credit' : curResult.riskTier === 'CAUTION' ? 'bg-ledger-seal' : 'bg-ledger-debit'
+                            }`}
+                            style={{ width: `${Math.min(100, curResult.utilizationRatioPercent)}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      <p className="text-sm text-ledger-navy/80 leading-relaxed border-l-2 border-ledger-rule pl-2.5">
+                        {curResult.riskTier === 'SAFE' &&
+                          `This uses only ${curResult.utilizationRatioPercent}% of your limit — no expected score impact.`}
+                        {curResult.riskTier === 'CAUTION' &&
+                          `This locks ${curResult.utilizationRatioPercent}% of your ₹${curResult.totalCreditLimit.toLocaleString('en-IN')} limit — may cause a minor score dip (est. ${curResult.estimatedScoreDropRange} pts) if it stays high through your next billing cycle.`}
+                        {curResult.riskTier === 'DANGER' &&
+                          `This locks ${curResult.utilizationRatioPercent}% of your ₹${curResult.totalCreditLimit.toLocaleString('en-IN')} limit — expect an estimated ${curResult.estimatedScoreDropRange} point score drop on your next report.`}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Card reward check (Dual-Ledger) */}
+              {isCreditBasedSelection && (
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setIsCardRewardOpen(!isCardRewardOpen)}
+                    className="w-full px-3.5 py-2.5 flex items-center justify-between text-sm font-semibold text-ledger-navy hover:bg-ledger-paper/60 transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Wallet className="w-3.5 h-3.5 text-ledger-navy/50" />
+                      Card reward check
+                      <span className="font-mono tabular-nums text-xs text-ledger-debit">
+                        -₹{forfeitedRewardResult.forfeitedIfEmi.toLocaleString('en-IN')}
+                      </span>
+                    </span>
+                    {isCardRewardOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </button>
+                  {isCardRewardOpen && (
+                    <div className="px-3.5 pb-3.5 space-y-3">
+                      <div className="space-y-1.5">
+                        <span className="text-xs font-semibold text-ledger-navy/60">Which card are you using?</span>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {QUICK_CARD_IDS.map((id) => {
+                            const card = findCardRewardProfile(id);
+                            if (!card) return null;
+                            const isActive = !isCustomCardRate && selectedCardId === id;
+                            return (
+                              <button
+                                key={id}
+                                type="button"
+                                onClick={() => persistCardChoice(id)}
+                                className={`px-2.5 py-1 text-xs font-semibold border transition-colors ${
+                                  isActive
+                                    ? 'bg-ledger-navy text-white border-ledger-navy'
+                                    : 'bg-white text-ledger-navy/70 border-ledger-rule hover:border-ledger-navy/40'
+                                }`}
+                              >
+                                {card.shortLabel}
+                              </button>
+                            );
+                          })}
+                          <button
+                            type="button"
+                            onClick={() => setShowFullCardList(!showFullCardList)}
+                            className="px-2.5 py-1 text-xs font-semibold border border-dashed border-ledger-navy/30 text-ledger-navy/60 hover:border-ledger-navy/60 inline-flex items-center gap-1"
+                          >
+                            {showFullCardList ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                            More cards
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => persistCardChoice('custom', customCardRatePercent)}
+                            className={`px-2.5 py-1 text-xs font-semibold border transition-colors ${
+                              isCustomCardRate
+                                ? 'bg-ledger-navy text-white border-ledger-navy'
+                                : 'bg-white text-ledger-navy/70 border-ledger-rule hover:border-ledger-navy/40'
+                            }`}
+                          >
+                            Custom %
+                          </button>
+                        </div>
+                      </div>
+
+                      {showFullCardList && (
+                        <div className="space-y-1.5 pt-1 border-t border-ledger-rule">
+                          <div className="relative">
+                            <Search className="w-3.5 h-3.5 text-ledger-navy/40 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                            <input
+                              type="text"
+                              value={cardSearchQuery}
+                              onChange={(e) => setCardSearchQuery(e.target.value)}
+                              placeholder="Search your bank or card (e.g. Axis, HDFC, SBI)"
+                              className="w-full pl-8 pr-3 py-1.5 border border-ledger-rule text-sm font-medium text-ledger-navy focus:outline-none focus:border-ledger-navy bg-white"
+                            />
+                          </div>
+                          <div className="max-h-36 overflow-y-auto space-y-1 pr-1">
+                            {filteredCardList.map((card) => (
+                              <button
+                                key={card.id}
+                                type="button"
+                                onClick={() => {
+                                  persistCardChoice(card.id);
+                                  setShowFullCardList(false);
+                                }}
+                                className={`w-full text-left px-2.5 py-1.5 text-xs font-semibold border transition-colors ${
+                                  !isCustomCardRate && selectedCardId === card.id
+                                    ? 'bg-ledger-navy text-white border-ledger-navy'
+                                    : 'bg-white text-ledger-navy/70 border-ledger-rule hover:border-ledger-navy/40'
+                                }`}
+                              >
+                                {card.bankOrCard}
+                              </button>
+                            ))}
+                            {filteredCardList.length === 0 && (
+                              <p className="text-xs text-ledger-navy/50 px-1 py-2">No match — use "Custom %" instead.</p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {isCustomCardRate && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-semibold text-ledger-navy/60 shrink-0">Your card's reward rate</span>
+                          <input
+                            type="number"
+                            min={0}
+                            max={20}
+                            step={0.1}
+                            value={customCardRatePercent}
+                            onChange={(e) => persistCardChoice('custom', Math.max(0, Number(e.target.value) || 0))}
+                            className="w-20 px-2.5 py-1 border border-ledger-rule text-xs font-mono tabular-nums text-ledger-navy focus:outline-none focus:border-ledger-navy bg-white"
+                          />
+                          <span className="text-xs font-semibold text-ledger-navy/60">%</span>
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-2 divide-x divide-ledger-rule border border-ledger-rule">
+                        <div className="p-2.5">
+                          <div className="text-[11px] font-semibold text-ledger-navy/50">Full-swipe reward</div>
+                          <div className="text-base font-bold font-mono tabular-nums text-ledger-credit">
+                            +₹{forfeitedRewardResult.rewardIfFullSwipe.toLocaleString('en-IN')}
+                          </div>
+                          <div className="text-[11px] text-ledger-navy/50">{activeCardLabel} @ {activeCardRatePercent}%</div>
+                        </div>
+                        <div className="p-2.5">
+                          <div className="text-[11px] font-semibold text-ledger-navy/50">Forfeited on EMI</div>
+                          <div className="text-base font-bold font-mono tabular-nums text-ledger-debit">
+                            -₹{forfeitedRewardResult.forfeitedIfEmi.toLocaleString('en-IN')}
+                          </div>
+                          <div className="text-[11px] text-ledger-navy/50">EMI earns ₹0 reward</div>
+                        </div>
+                      </div>
+
+                      {!isCustomCardRate && (
+                        <p className="text-[11px] text-ledger-navy/50 leading-relaxed">{selectedCardProfile.notes}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* EMI cost breakdown — only when this surface actually offers bank EMI */}
+              {hasRealEmiOption && (
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setIsEmiMathOpen(!isEmiMathOpen)}
+                    className="w-full px-3.5 py-2.5 flex items-center justify-between text-sm font-semibold text-ledger-navy hover:bg-ledger-paper/60 transition-colors"
+                  >
+                    <span className="flex items-center gap-2">
+                      <AlertTriangle className="w-3.5 h-3.5 text-ledger-navy/50" />
+                      What EMI actually costs
+                      <span className="font-mono tabular-nums text-xs text-ledger-debit">{mathResult.effectiveAnnualPercentageRate}% APR</span>
+                    </span>
+                    {isEmiMathOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </button>
+
+                  {isEmiMathOpen && (
+                    <div className="px-3.5 pb-3.5 space-y-4">
+                      {/* Ledger-style stat row */}
+                      <div className="grid grid-cols-3 divide-x divide-ledger-rule border border-ledger-rule">
+                        <div className="p-2.5">
+                          <div className="text-[11px] font-semibold text-ledger-navy/50">Effective APR</div>
+                          <div className="text-xl font-bold font-mono tabular-nums text-ledger-debit">{mathResult.effectiveAnnualPercentageRate}%</div>
+                          <div className="text-[11px] text-ledger-navy/50">vs 0% advertised</div>
+                        </div>
+                        <div className="p-2.5">
+                          <div className="text-[11px] font-semibold text-ledger-navy/50">GST + fee drag</div>
+                          <div className="text-xl font-bold font-mono tabular-nums text-ledger-navy">₹{mathResult.totalHiddenFriction.toLocaleString('en-IN')}</div>
+                          <div className="text-[11px] text-ledger-navy/50">₹{processingFee} fee + ₹{mathResult.totalGstOnInterest.toFixed(2)} GST</div>
+                        </div>
+                        <div className="p-2.5">
+                          <div className="text-[11px] font-semibold text-ledger-navy/50">Monthly outflow</div>
+                          <div className="text-xl font-bold font-mono tabular-nums text-ledger-navy">₹{mathResult.monthlyBaseEmi.toLocaleString('en-IN')}</div>
+                          <div className="text-[11px] text-ledger-navy/50">for {tenure} months</div>
+                        </div>
+                      </div>
+
+                      {/* Plain-English translation */}
+                      <ul className="space-y-2 text-sm text-ledger-navy/80 leading-relaxed">
+                        <li className="border-l-2 border-ledger-debit pl-2.5">
+                          The merchant's upfront discount offsets the bank's interest, but processing fees and statutory 18% GST turn 0% into <strong className="text-ledger-navy">{mathResult.effectiveAnnualPercentageRate}% effective APR</strong>.
+                        </li>
+                        <li className="border-l-2 border-ledger-seal pl-2.5">
+                          Every month, GST on the interest component adds up to a guaranteed <strong className="text-ledger-navy">₹{mathResult.totalHiddenFriction.toLocaleString('en-IN')}</strong> that you can't get back.
+                        </li>
+                        <li className="border-l-2 border-ledger-credit pl-2.5">
+                          Paying upfront by UPI or debit card removes that ₹{mathResult.totalHiddenFriction.toLocaleString('en-IN')} drag entirely and keeps your credit limit untouched.
+                        </li>
+                      </ul>
+
+                      {/* Tenure slider */}
+                      <div className="border-t border-ledger-rule pt-3 space-y-2">
+                        <div className="flex items-center justify-between text-sm">
+                          <label htmlFor="ext-tenure-slider" className="font-semibold text-ledger-navy flex items-center gap-1.5">
+                            Tenure: <span className="font-mono tabular-nums font-bold">{tenure} months</span>
+                          </label>
+                        </div>
+                        <input
+                          id="ext-tenure-slider"
+                          type="range"
+                          min={0}
+                          max={TENURE_OPTIONS.length - 1}
+                          step={1}
+                          value={sliderIndex}
+                          onChange={(e) => setSliderIndex(Number(e.target.value))}
+                          className="w-full h-1.5 bg-ledger-rule appearance-none cursor-pointer accent-ledger-navy focus:outline-none"
+                        />
+                        <div className="flex items-center justify-between">
+                          {TENURE_OPTIONS.map((opt, idx) => (
+                            <button
+                              key={opt}
+                              type="button"
+                              onClick={() => setSliderIndex(idx)}
+                              className={`px-2 py-1 text-xs font-mono tabular-nums ${
+                                sliderIndex === idx ? 'text-ledger-navy font-bold' : 'text-ledger-navy/40'
+                              }`}
+                            >
+                              {opt}m
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Wealth-recovery projections — buried tier 3, genuinely optional */}
+                      <div className="border-t border-ledger-rule pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setIsRecoveryOpen(!isRecoveryOpen)}
+                          className="w-full py-2 flex items-center justify-between text-xs font-semibold text-ledger-navy/70 hover:text-ledger-navy transition-colors"
+                        >
+                          <span className="flex items-center gap-1.5">
+                            <TrendingUp className="w-3.5 h-3.5" />
+                            What that saved money could grow into
+                          </span>
+                          {isRecoveryOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                        </button>
+
+                        {isRecoveryOpen && (
+                          <div className="space-y-2.5 pb-1">
+                            <p className="text-xs text-ledger-navy/50">
+                              If you invested the ₹{recoveryCompounding.savedFriction.toLocaleString('en-IN')} you saved into a 7.10% sovereign T-Bill instead:
+                            </p>
+                            <div className="grid grid-cols-3 divide-x divide-ledger-rule border border-ledger-rule">
+                              {(['1Y', '3Y', '5Y'] as const).map((h) => {
+                                const value = h === '1Y' ? recoveryCompounding.fv1Year : h === '3Y' ? recoveryCompounding.fv3Year : recoveryCompounding.fv5Year;
+                                const label = h === '1Y' ? '1 year' : h === '3Y' ? '3 years' : '5 years';
+                                const isActive = compoundingHorizon === h;
+                                return (
+                                  <button
+                                    key={h}
+                                    type="button"
+                                    onClick={() => setCompoundingHorizon(h)}
+                                    className={`p-2 text-center transition-colors ${isActive ? 'bg-ledger-navy text-white' : 'bg-white text-ledger-navy hover:bg-ledger-paper'}`}
+                                  >
+                                    <div className={`text-[11px] ${isActive ? 'text-white/60' : 'text-ledger-navy/50'}`}>{label}</div>
+                                    <div className="text-base font-bold font-mono tabular-nums">₹{value.toLocaleString('en-IN')}</div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                            <div className="flex items-center justify-between gap-2 p-2.5 bg-ledger-navy text-white text-xs">
+                              <span className="flex items-center gap-2 text-white/80">
+                                <PiggyBank className="w-3.5 h-3.5 shrink-0" />
+                                Invest ₹{mathResult.monthlyBaseEmi.toLocaleString('en-IN')}/mo in a liquid fund instead:
+                              </span>
+                              <span className="font-mono tabular-nums font-bold shrink-0">₹{recoveryCompounding.sipFv.toLocaleString('en-IN')}</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Full amortization table — tier 3, buried */}
+                      <div className="border-t border-ledger-rule pt-1">
+                        <button
+                          onClick={() => setIsProofOpen(!isProofOpen)}
+                          className="w-full py-2 flex items-center justify-between text-xs font-semibold text-ledger-navy/70 hover:text-ledger-navy transition-colors"
+                        >
+                          <span>Full monthly breakdown ({tenure} months)</span>
+                          {isProofOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                        </button>
+                        {isProofOpen && (
+                          <div className="max-h-44 overflow-y-auto border border-ledger-rule">
+                            <table className="w-full text-[11px] text-left font-mono tabular-nums">
+                              <thead className="bg-ledger-paper text-ledger-navy/60 font-bold sticky top-0">
+                                <tr>
+                                  <th className="py-1.5 px-2 font-semibold">Month</th>
+                                  <th className="py-1.5 px-2 font-semibold">Principal</th>
+                                  <th className="py-1.5 px-2 font-semibold">Interest</th>
+                                  <th className="py-1.5 px-2 font-semibold text-ledger-debit">GST</th>
+                                  <th className="py-1.5 px-2 font-semibold">Total</th>
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-ledger-rule text-ledger-navy/70">
+                                {mathResult.schedule.map((row) => (
+                                  <tr key={row.month}>
+                                    <td className="py-1 px-2 font-bold">{row.month}</td>
+                                    <td className="py-1 px-2">₹{row.principalComponent.toLocaleString('en-IN')}</td>
+                                    <td className="py-1 px-2">₹{row.interestComponent.toLocaleString('en-IN')}</td>
+                                    <td className="py-1 px-2 text-ledger-debit">₹{row.gstOnInterest.toFixed(2)}</td>
+                                    <td className="py-1 px-2 font-bold text-ledger-navy">₹{row.totalMonthlyCashflow.toLocaleString('en-IN')}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          )}
 
-
-          {/* Action Buttons: Cancel (STAYS ON CURRENT PAGE) vs Proceed (GOES FORWARD) */}
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
-            <button
-              id="btn-cancel-stay"
-              onClick={onCancelStayOnPage}
-              className="w-1/2 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs sm:text-sm font-bold transition-colors flex items-center justify-center gap-1.5 border border-slate-300 shadow-sm"
-            >
-              <RotateCcw className="w-3.5 h-3.5 text-slate-600" />
-              <span>Cancel & Modify Terms</span>
-            </button>
-
-            <button
-              id="btn-close-proceed"
-              onClick={onProceedAndContinue}
-              className="w-1/2 py-3 px-4 rounded-xl bg-slate-900 hover:bg-black text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center justify-center gap-1.5"
-            >
-              <span>I Understand, Proceed</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            {/* Advisory — short, always visible, this is CommitGuard's own take */}
+            <div className="text-sm text-ledger-navy/80 leading-relaxed border-l-2 border-ledger-seal pl-3">
+              <span className="font-bold text-ledger-navy">Why we're flagging this. </span>
+              {surfaceType === 'TRAVEL' ? (
+                <>Travel Now, Pay Later advertises low monthly amounts but charges 24–36% penalty APR if you miss a payment after your trip. A 6-month liquid fund SIP at 7.10% gets you there debt-free instead.</>
+              ) : surfaceType === 'EDTECH' ? (
+                <>"0% subvention" loan packages often bake a 3–5% surcharge into the course price itself. Paying by direct transfer usually earns a comparable cash rebate.</>
+              ) : surfaceType === 'UDEMY' ? (
+                <>Udemy's countdown timer resets every browser session — it isn't really running out. Over 87% of self-paced courses bought on impulse are never finished. Pay by UPI or hold the money in a liquid fund until you've scheduled time to actually study.</>
+              ) : surfaceType === 'AMAZON' ? (
+                <>Paying in full with an Amazon Pay ICICI card locks a real 5% cashback. Choosing No-Cost EMI instead costs you roughly ₹{mathResult.totalHiddenFriction.toLocaleString('en-IN')} in non-refundable GST and fees.</>
+              ) : (
+                <>Paying in full with a Flipkart Axis card locks a real 5% cashback. Choosing No-Cost EMI instead costs you roughly ₹{mathResult.totalHiddenFriction.toLocaleString('en-IN')} in non-refundable GST and fees.</>
+              )}
+            </div>
           </div>
-
         </div>
 
+        {/* Action row */}
+        <div className="bg-white px-6 py-3.5 border-t border-ledger-rule flex items-center justify-between gap-3">
+          <button
+            id="btn-cancel-stay"
+            onClick={onCancelStayOnPage}
+            className="w-1/2 py-2.5 px-4 border border-ledger-rule text-ledger-navy text-sm sm:text-base font-semibold hover:bg-ledger-paper transition-colors flex items-center justify-center gap-1.5"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            Cancel and change terms
+          </button>
+          <button
+            id="btn-close-proceed"
+            onClick={onProceedAndContinue}
+            className="w-1/2 py-2.5 px-4 bg-ledger-navy text-white text-sm sm:text-base font-semibold hover:bg-ledger-navy/90 transition-colors flex items-center justify-center gap-1.5"
+          >
+            Continue
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   );

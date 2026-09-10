@@ -191,3 +191,42 @@ export interface MultiCartEmiRiskResult {
   potentialGstLeak: number;
   totalRiskAmount: number;
 }
+
+// ==========================================
+// 8. Credit Utilization Ratio (CUR) / CIBIL Impact Schema
+// ==========================================
+
+export type CreditUtilizationRiskTier = 'SAFE' | 'CAUTION' | 'DANGER';
+
+export interface CreditUtilizationInput {
+  orderPrincipal: number;        // Full transaction principal blocked upfront (not just the EMI installment)
+  existingCardBalance: number;   // Other spends already outstanding on the same card
+  totalCreditLimit: number;      // User's total credit limit on that card
+}
+
+export interface CreditUtilizationResult {
+  orderPrincipal: number;
+  existingCardBalance: number;
+  totalCreditLimit: number;
+  blockedAmount: number;              // orderPrincipal + existingCardBalance
+  utilizationRatioPercent: number;    // (blockedAmount / totalCreditLimit) * 100
+  riskTier: CreditUtilizationRiskTier;
+  estimatedScoreDropRange: string;    // e.g. "0", "5-15", "20-40"
+}
+
+// ==========================================
+// 9. Dual-Ledger Forfeited Card Reward Schema
+// ==========================================
+
+export interface ForfeitedRewardInput {
+  orderPrincipal: number;
+  rewardRatePercent: number; // category-aware rate for the selected card + surface
+}
+
+export interface ForfeitedRewardResult {
+  orderPrincipal: number;
+  rewardRatePercent: number;
+  rewardIfFullSwipe: number;    // reward earned paying in full, no EMI
+  netCostIfFullSwipe: number;   // orderPrincipal - rewardIfFullSwipe
+  forfeitedIfEmi: number;       // reward lost entirely by converting to EMI (MITC-verified: always 100%)
+}

@@ -13,6 +13,11 @@
     "*://*.makemytrip.com/*",
     "*://*.udemy.com/*"
   ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "background": {
     "service_worker": "src/extension/background.ts",
     "type": "module"
@@ -30,7 +35,12 @@
     }
   ],
   "action": {
-    "default_title": "CommitGuard Active (Monitoring Checkouts)"
+    "default_title": "CommitGuard Active (Monitoring Checkouts)",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
   },
   "web_accessible_resources": [
     {
