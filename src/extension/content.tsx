@@ -1269,17 +1269,50 @@ import { ExtensionCommitGuardModal } from './CommitGuardModal';
     }
     if (!detectedName) detectedName = 'Identified Flipkart Item';
 
-    // 1. Primary Buy Button / Price text extraction
-    const buyButtonEls = document.querySelectorAll('button, a, div, span');
-    for (const el of Array.from(buyButtonEls)) {
-      const txt = (el.textContent || '').trim();
-      // Match "Buy now at ₹19,999" or "Pay ₹19,999" or "Lowest price for you ₹18,999"
-      const m = txt.match(/(?:Buy\s*now\s*at|Pay|Lowest\s*price\s*for\s*you)\s*₹\s*([0-9,]+)/i);
-      if (m && m[1]) {
-        const p = parseCurrencyNumber(m[1]);
-        if (p >= 500 && p <= 5000000) {
-          detectedPrice = p;
-          break;
+    // 1. Clicked element text — the actual "Continue with EMI" / "Place Order" button the user
+    // clicked. Take the LAST ₹ figure in its text (the struck-through MRP renders first, the
+    // real payable total renders after/below it), since this is the single most reliable signal.
+    if (clickedEl) {
+      const clickedCandidateTexts = [clickedEl.innerText || '', clickedEl.textContent || ''];
+      const parentClickBtn = clickedEl.closest('button, a, [role="button"]');
+      if (parentClickBtn) clickedCandidateTexts.push(parentClickBtn.textContent || '');
+      for (const t of clickedCandidateTexts) {
+        const matches = Array.from(t.matchAll(/₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/g));
+        if (matches.length > 0) {
+          const num = parseCurrencyNumber(matches[matches.length - 1][1]);
+          if (num >= 500 && num <= 5000000) {
+            detectedPrice = num;
+            break;
+          }
+        }
+      }
+    }
+
+    // 1B. Authoritative "Total Amount" / "Total Payable" labeled text — must run BEFORE the
+    // generic [class*="price"] selector below, which otherwise grabs whichever price-classed
+    // element appears FIRST on the page (usually "MRP", not the actual amount payable).
+    if (!detectedPrice) {
+      const totalMatch = bodyText.match(
+        /\b(?:Total\s*Amount|Total\s*Payable|Order\s*Total|Grand\s*Total)\b[^₹$€£]{0,24}[₹$€£]\s*([0-9,]+(?:\.[0-9]{1,2})?)/i
+      );
+      if (totalMatch && totalMatch[1]) {
+        const num = parseCurrencyNumber(totalMatch[1]);
+        if (num >= 500 && num <= 5000000) detectedPrice = num;
+      }
+    }
+
+    // 1C. Buy Button / Price text scan across the page (older fallback — "Buy now at ₹19,999")
+    if (!detectedPrice) {
+      const buyButtonEls = document.querySelectorAll('button, a, div, span');
+      for (const el of Array.from(buyButtonEls)) {
+        const txt = (el.textContent || '').trim();
+        const m = txt.match(/(?:Buy\s*now\s*at|Pay|Lowest\s*price\s*for\s*you)\s*₹\s*([0-9,]+)/i);
+        if (m && m[1]) {
+          const p = parseCurrencyNumber(m[1]);
+          if (p >= 500 && p <= 5000000) {
+            detectedPrice = p;
+            break;
+          }
         }
       }
     }

@@ -9271,15 +9271,41 @@
         }
       }
       if (!detectedName) detectedName = "Identified Flipkart Item";
-      const buyButtonEls = document.querySelectorAll("button, a, div, span");
-      for (const el of Array.from(buyButtonEls)) {
-        const txt = (el.textContent || "").trim();
-        const m = txt.match(/(?:Buy\s*now\s*at|Pay|Lowest\s*price\s*for\s*you)\s*₹\s*([0-9,]+)/i);
-        if (m && m[1]) {
-          const p = parseCurrencyNumber(m[1]);
-          if (p >= 500 && p <= 5e6) {
-            detectedPrice = p;
-            break;
+      if (clickedEl) {
+        const clickedCandidateTexts = [clickedEl.innerText || "", clickedEl.textContent || ""];
+        const parentClickBtn = clickedEl.closest('button, a, [role="button"]');
+        if (parentClickBtn) clickedCandidateTexts.push(parentClickBtn.textContent || "");
+        for (const t of clickedCandidateTexts) {
+          const matches = Array.from(t.matchAll(/₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/g));
+          if (matches.length > 0) {
+            const num = parseCurrencyNumber(matches[matches.length - 1][1]);
+            if (num >= 500 && num <= 5e6) {
+              detectedPrice = num;
+              break;
+            }
+          }
+        }
+      }
+      if (!detectedPrice) {
+        const totalMatch = bodyText.match(
+          /\b(?:Total\s*Amount|Total\s*Payable|Order\s*Total|Grand\s*Total)\b[^₹$€£]{0,24}[₹$€£]\s*([0-9,]+(?:\.[0-9]{1,2})?)/i
+        );
+        if (totalMatch && totalMatch[1]) {
+          const num = parseCurrencyNumber(totalMatch[1]);
+          if (num >= 500 && num <= 5e6) detectedPrice = num;
+        }
+      }
+      if (!detectedPrice) {
+        const buyButtonEls = document.querySelectorAll("button, a, div, span");
+        for (const el of Array.from(buyButtonEls)) {
+          const txt = (el.textContent || "").trim();
+          const m = txt.match(/(?:Buy\s*now\s*at|Pay|Lowest\s*price\s*for\s*you)\s*₹\s*([0-9,]+)/i);
+          if (m && m[1]) {
+            const p = parseCurrencyNumber(m[1]);
+            if (p >= 500 && p <= 5e6) {
+              detectedPrice = p;
+              break;
+            }
           }
         }
       }

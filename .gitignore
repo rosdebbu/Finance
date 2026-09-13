@@ -34,3 +34,6 @@ public/test-*.css
 .vscode/
 .idea/
 
+# Internal planning/research docs — kept locally, not shown in the repo for demos
+docs/*.md
+
